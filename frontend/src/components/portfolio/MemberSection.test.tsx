@@ -3,6 +3,7 @@ import '@testing-library/jest-dom/vitest'
 
 import { afterEach, beforeEach, describe, expect, it } from 'vitest'
 import { cleanup, render, screen } from '@testing-library/react'
+import { MemoryRouter } from 'react-router'
 
 import { LanguageProvider } from '../../contexts/LanguageProvider'
 import { portfolioData } from '../../data/portfolioData'
@@ -15,7 +16,9 @@ function renderMemberSection(language: TestLanguage) {
 
   return render(
     <LanguageProvider>
-      <MemberSection />
+      <MemoryRouter>
+        <MemberSection />
+      </MemoryRouter>
     </LanguageProvider>,
   )
 }
