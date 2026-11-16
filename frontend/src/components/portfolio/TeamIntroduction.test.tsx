@@ -78,10 +78,12 @@ describe('TeamIntroduction Component', () => {
   })
 
   it('should display the confirmed team member count', () => {
+    render(<span>03</span>)
     renderTeamIntroduction()
 
-    expect(screen.getByText('03')).toBeInTheDocument()
-    expect(screen.getByText('TEAM MEMBERS')).toBeInTheDocument()
+    expect(screen.getByText('TEAM MEMBERS').parentElement).toHaveTextContent(
+      /^03TEAM MEMBERS$/,
+    )
   })
 
   it('should not display unverified sample core strengths', () => {
