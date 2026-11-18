@@ -1,5 +1,5 @@
 
-import { useState } from 'react'
+import { useState, type CSSProperties } from 'react'
 
 import {
   ArrowUpRight,
@@ -154,7 +154,7 @@ function MemberAvatar({
   return (
     <div
       aria-hidden="true"
-      className="grid size-20 shrink-0 place-items-center overflow-hidden rounded-2xl border border-white/10 font-display text-xl font-bold text-white"
+      className="kuai-photo grid size-24 shrink-0 place-items-center overflow-hidden rounded-2xl border border-white/10 font-display text-2xl font-bold text-white"
       style={{
         background: `linear-gradient(135deg, ${primaryColor}, ${secondaryColor})`,
         boxShadow: `0 0 28px ${glow}`,
@@ -441,7 +441,8 @@ function MemberCard({
   return (
     <article
       aria-labelledby={`member-${member.id}-name`}
-      className="group relative flex h-full flex-col overflow-hidden rounded-panel border border-border-subtle bg-surface-900 p-6 transition duration-300 hover:-translate-y-1 hover:shadow-glow sm:p-7"
+      className="kuai-ring kuai-lift group relative flex h-full flex-col overflow-hidden rounded-panel border border-border-subtle bg-surface-900 p-6 sm:p-7"
+      style={{ '--kuai-ring-color': member.themeColor.primary } as CSSProperties}
     >
       {/* Member-specific accent */}
       <div

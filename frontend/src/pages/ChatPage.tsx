@@ -13,10 +13,11 @@ import {
   MoreHorizontal,
   Plus,
   RefreshCw,
-  Sparkles,
   Trash2,
   Users,
 } from 'lucide-react'
+
+import { useSearchParams } from 'react-router'
 
 import Navbar from '../components/layout/Navbar'
 import { useLanguage } from '../contexts/language-context'
@@ -121,6 +122,34 @@ interface SavedConversation {
   readonly updatedAt: string
 }
 
+const CHAT_HISTORY_STORAGE_KEY = 'team-portfolio-ai-chat-history-v1'
+const MAX_SAVED_CONVERSATIONS = 30
+
+function isSavedConversation(value: unknown): value is SavedConversation {
+  return (
+    typeof value === 'object' &&
+    value !== null &&
+    typeof (value as SavedConversation).conversationId === 'string' &&
+    typeof (value as SavedConversation).title === 'string' &&
+    typeof (value as SavedConversation).updatedAt === 'string'
+  )
+}
+
+// Read the conversation list this browser saved earlier (the messages themselves live in the backend database).
+function loadSavedConversations(): SavedConversation[] {
+  try {
+    const parsed: unknown = JSON.parse(
+      window.localStorage.getItem(CHAT_HISTORY_STORAGE_KEY) ?? '[]',
+    )
+
+    return Array.isArray(parsed)
+      ? parsed.filter(isSavedConversation).slice(0, MAX_SAVED_CONVERSATIONS)
+      : []
+  } catch {
+    return []
+  }
+}
+
 function ChatPage() {
   const { language } = useLanguage()
   const copy = chatPageCopy[language]
@@ -137,7 +166,7 @@ function ChatPage() {
   // Conversation State
   const [conversationId, setConversationId] = useState<string | null>(null)
   const [savedConversations, setSavedConversations] =
-    useState<SavedConversation[]>([])
+    useState<SavedConversation[]>(loadSavedConversations)
   const [isHistoryOpen, setIsHistoryOpen] = useState(false)
   const [openMenuId, setOpenMenuId] = useState<string | null>(null)
 
@@ -149,6 +178,29 @@ function ChatPage() {
 
   // Scroll Reference
   const bottomRef = useRef<HTMLDivElement>(null)
+
+  // A question asked from the portfolio hero arrives as /chat?q=...
+  const [searchParams] = useSearchParams()
+  const questionFromUrl = searchParams.get('q')
+  const [appliedQuestion, setAppliedQuestion] = useState<string | null>(null)
+
+  // Prefill the composer once per new question (derived state, updated during render).
+  if (questionFromUrl && questionFromUrl !== appliedQuestion) {
+    setAppliedQuestion(questionFromUrl)
+    setInput(questionFromUrl.slice(0, 2000))
+  }
+
+  // Keep the conversation list after a page refresh.
+  useEffect(() => {
+    try {
+      window.localStorage.setItem(
+        CHAT_HISTORY_STORAGE_KEY,
+        JSON.stringify(savedConversations.slice(0, MAX_SAVED_CONVERSATIONS)),
+      )
+    } catch {
+      // Storage can be full or blocked (private mode); history then lasts for this visit only.
+    }
+  }, [savedConversations])
 
   // Automatically scroll to the latest message
   useEffect(() => {
@@ -306,6 +358,12 @@ const handleNewConversation = () => {
       setIsHistoryOpen(false)
       setOpenMenuId(null)
     } catch (err: unknown) {
+      // The server no longer has this conversation: drop it from the saved list.
+      if (err instanceof ChatApiException && err.status === 404) {
+        setSavedConversations((current) => current.filter(
+          (conversation) => conversation.conversationId !== savedConversation.conversationId,
+        ))
+      }
       setError(err instanceof Error ? err.message : copy.genericError)
     } finally {
       setIsLoading(false)
@@ -317,7 +375,12 @@ const handleNewConversation = () => {
     setError(null)
 
     try {
-      await deleteChatConversation(savedConversation.conversationId)
+      try {
+        await deleteChatConversation(savedConversation.conversationId)
+      } catch (err: unknown) {
+        // Already gone on the server (e.g. expired): still remove it here.
+        if (!(err instanceof ChatApiException && err.status === 404)) throw err
+      }
       const updatedConversations = savedConversations.filter(
         (conversation) => conversation.conversationId !== savedConversation.conversationId,
       )
@@ -342,7 +405,7 @@ const handleNewConversation = () => {
   }
 
   return (
-    <div className="min-h-screen bg-ink-950 text-white">
+    <div className="min-h-screen bg-transparent text-white">
 
       <Navbar />
 
@@ -355,9 +418,7 @@ const handleNewConversation = () => {
           <div>
             <div className="flex items-center gap-2">
 
-              <div className="grid size-10 place-items-center rounded-xl bg-brand-500/15 text-brand-300">
-                <Sparkles size={20} />
-              </div>
+              <span className="kuai-orb size-11 rounded-full" aria-hidden="true" />
 
               <h1 className="font-display text-2xl font-semibold text-white">
                 {copy.title}

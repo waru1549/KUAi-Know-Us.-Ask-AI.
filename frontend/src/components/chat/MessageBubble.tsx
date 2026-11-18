@@ -70,7 +70,7 @@ function MessageBubble({ message }: MessageBubbleProps) {
         <div
           className={`rounded-2xl px-4 py-3 ${
             isUser
-              ? 'rounded-tr-sm bg-brand-500 text-white'
+              ? 'rounded-tr-sm bg-linear-to-br from-fuchsia-600 to-violet-600 text-white'
               : 'rounded-tl-sm border border-white/10 bg-surface-800 text-slate-200'
           }`}
         >

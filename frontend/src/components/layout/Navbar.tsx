@@ -5,7 +5,6 @@ import { Link, NavLink } from 'react-router'
 import {
   Menu,
   MessageCircle,
-  Sparkles,
   UserRound,
   X,
 } from 'lucide-react'
@@ -52,7 +51,7 @@ function LanguageSwitcher({
             onClick={() => onChange(option.value)}
             className={`min-w-10 rounded-full px-3 py-2 text-xs font-bold transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-300 ${
               isActive
-                ? 'bg-brand-500 text-white shadow-lg shadow-brand-500/20'
+                ? 'bg-linear-to-r from-fuchsia-500 to-violet-600 text-white shadow-lg shadow-fuchsia-500/20'
                 : 'text-slate-400 hover:bg-white/10 hover:text-white'
             }`}
           >
@@ -100,27 +99,20 @@ function Navbar() {
   }
 
   return (
-    <header className="sticky top-0 z-50 border-b border-white/10 bg-ink-950/85 backdrop-blur-xl">
+    <header className="sticky top-0 z-50 border-b border-white/10 bg-ink-950/45 backdrop-blur-xl">
       <div className="mx-auto flex max-w-7xl items-center justify-between px-5 py-4 lg:px-8">
         {/* Brand */}
         <Link
           to="/"
           onClick={closeMobileMenu}
-          aria-label="Team Portfolio AI home"
-          className="flex items-center gap-3"
+          aria-label="KUAi home"
+          className="flex items-center gap-3 rounded-lg focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-accent-magenta"
         >
-          <span className="grid size-10 place-items-center rounded-xl bg-brand-500/15 text-brand-300 ring-1 ring-brand-400/20">
-            <Sparkles size={21} />
-          </span>
+          <span className="kuai-orb size-9 rounded-xl" aria-hidden="true" />
 
-          <span className="flex flex-col gap-0.5">
-            <span className="text-sm font-bold tracking-wide text-white">
-              TEAM PORTFOLIO
-            </span>
-
-            <span className="text-[10px] font-semibold tracking-[0.2em] text-brand-300">
-              AI EXPERIENCE
-            </span>
+          <span className="font-display text-2xl font-extrabold tracking-[-0.02em] text-white">
+            KU<span className="text-accent-cyan">Ai</span>
+            <span className="text-accent-magenta">.</span>
           </span>
         </Link>
 
@@ -140,6 +132,11 @@ function Navbar() {
               {copy.aiChat}
             </NavLink>
           </nav>
+
+          <span className="hidden items-center gap-2 font-mono text-[11px] tracking-[0.12em] text-sky-300 lg:inline-flex">
+            <span className="kuai-pulse-dot size-1.5 rounded-full bg-accent-cyan" aria-hidden="true" />
+            POWERED BY GEMINI
+          </span>
 
           <LanguageSwitcher
             language={language}

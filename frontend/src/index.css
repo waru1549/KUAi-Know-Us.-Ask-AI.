@@ -1,4 +1,5 @@
 
+@import url("https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,800&family=IBM+Plex+Sans+Thai:wght@400;500;600&family=Inter:wght@400;500;600;700&display=swap");
 @import "tailwindcss";
 
 /* =========================================
@@ -10,15 +11,15 @@
 
 @theme {
   /* Background */
-  --color-ink-950: #070b16;
-  --color-ink-900: #0c1220;
+  --color-ink-950: #05030f;
+  --color-ink-900: #0b0720;
 
   /* Surfaces */
-  --color-surface-900: #111827;
-  --color-surface-800: #172033;
+  --color-surface-900: rgb(18 11 44 / 0.58);
+  --color-surface-800: rgb(28 18 64 / 0.62);
 
   /* Borders */
-  --color-border-subtle: #283449;
+  --color-border-subtle: rgb(255 255 255 / 0.1);
 
   /* Brand */
   --color-brand-50: #f5f3ff;
@@ -31,17 +32,20 @@
 
   /* Accent */
   --color-accent-cyan: #67e8f9;
+  --color-accent-magenta: #f0abfc;
+  --color-accent-gold: #fde68a;
 
   /* Typography */
-  --font-sans: "Inter", "Segoe UI", system-ui, sans-serif;
-  --font-display: "Space Grotesk", "Segoe UI", system-ui, sans-serif;
+  --font-sans: "Inter", "IBM Plex Sans Thai", "Segoe UI", system-ui, sans-serif;
+  --font-display: "Bricolage Grotesque", "Space Grotesk", "Segoe UI", system-ui, sans-serif;
+  --font-thai: "IBM Plex Sans Thai", "Inter", system-ui, sans-serif;
 
   /* Border Radius */
   --radius-panel: 1.5rem;
   --radius-control: 0.75rem;
 
   /* Shadows */
-  --shadow-glow: 0 0 40px rgb(139 92 246 / 12%);
+  --shadow-glow: 0 0 50px rgb(217 70 239 / 14%);
 }
 
 /* 2. GLOBAL ROOT */
@@ -49,7 +53,7 @@
 :root {
   font-family: var(--font-sans);
   color: #f8fafc;
-  background: #070b16;
+  background: #03020a;
 
   font-synthesis: none;
   text-rendering: optimizeLegibility;
@@ -76,7 +80,7 @@ body {
   margin: 0;
   min-width: 320px;
   min-height: 100vh;
-  background-color: #070b16;
+  background-color: #03020a;
 }
 
 /* 4. FORM ELEMENTS */
@@ -96,6 +100,251 @@ textarea {
 /* 6. TEXT SELECTION */
 
 ::selection {
-  background: rgb(139 92 246 / 35%);
+  background: rgb(217 70 239 / 40%);
   color: #ffffff;
+}
+
+/* 7. GLASS SURFACES (let the galaxy show through) */
+
+.bg-surface-900,
+.kuai-glass {
+  backdrop-filter: blur(18px) saturate(1.3);
+  -webkit-backdrop-filter: blur(18px) saturate(1.3);
+}
+
+/* =========================================
+   8. ANIMATED GALAXY BACKGROUND
+========================================= */
+
+.galaxy {
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  overflow: hidden;
+  pointer-events: none;
+  background:
+    radial-gradient(ellipse 80% 60% at 75% 15%, #1b0a3f 0%, transparent 60%),
+    radial-gradient(ellipse 70% 60% at 10% 85%, #071a3a 0%, transparent 60%),
+    radial-gradient(ellipse 50% 40% at 50% 50%, #12062b 0%, transparent 70%),
+    #03020a;
+}
+
+.galaxy-nebula {
+  position: absolute;
+  border-radius: 50%;
+  filter: blur(80px);
+  mix-blend-mode: screen;
+}
+
+.galaxy-nebula--1 { width: 900px; height: 620px; top: -12%; left: -12%; opacity: .55; background: radial-gradient(closest-side, #c026d3, transparent); animation: galaxy-nebula 34s ease-in-out infinite; }
+.galaxy-nebula--2 { width: 860px; height: 860px; top: 30%; right: -18%; opacity: .5; background: radial-gradient(closest-side, #4f46e5, transparent); animation: galaxy-nebula 42s ease-in-out infinite reverse; }
+.galaxy-nebula--3 { width: 760px; height: 520px; bottom: -14%; left: 22%; opacity: .4; background: radial-gradient(closest-side, #0e7490, transparent); animation: galaxy-nebula 50s ease-in-out infinite; }
+
+.galaxy-stars { position: absolute; inset: 0; background-repeat: repeat; }
+
+.galaxy-stars--1 {
+  background-image:
+    radial-gradient(1px 1px at 20px 30px, #fff, transparent),
+    radial-gradient(1px 1px at 120px 80px, #c7d2fe, transparent),
+    radial-gradient(1px 1px at 200px 150px, #fff, transparent),
+    radial-gradient(1px 1px at 60px 190px, #fde68a, transparent),
+    radial-gradient(1px 1px at 170px 220px, #fff, transparent),
+    radial-gradient(1px 1px at 90px 120px, #f5d0fe, transparent),
+    radial-gradient(1px 1px at 225px 15px, #fff, transparent);
+  background-size: 240px 240px;
+  opacity: .85;
+  animation: galaxy-drift-1 70s linear infinite, galaxy-twinkle 3.5s ease-in-out infinite alternate;
+}
+
+.galaxy-stars--2 {
+  background-image:
+    radial-gradient(1.5px 1.5px at 50px 60px, #fff, transparent),
+    radial-gradient(1.5px 1.5px at 300px 120px, #a5f3fc, transparent),
+    radial-gradient(1.5px 1.5px at 180px 300px, #fff, transparent),
+    radial-gradient(1.5px 1.5px at 340px 340px, #f0abfc, transparent);
+  background-size: 380px 380px;
+  opacity: .9;
+  animation: galaxy-drift-2 110s linear infinite, galaxy-twinkle 5s ease-in-out infinite alternate-reverse;
+}
+
+.galaxy-stars--3 {
+  background-image:
+    radial-gradient(2px 2px at 100px 200px, #fff, transparent),
+    radial-gradient(2.5px 2.5px at 460px 90px, #fef3c7, transparent),
+    radial-gradient(2px 2px at 520px 480px, #e0e7ff, transparent);
+  background-size: 600px 600px;
+  filter: drop-shadow(0 0 4px #fff);
+  animation: galaxy-drift-3 160s linear infinite, galaxy-twinkle 7s ease-in-out infinite alternate;
+}
+
+.galaxy-parallax { position: absolute; inset: 0; transition: transform 1.2s cubic-bezier(.2,.8,.2,1); }
+
+.galaxy-spiral {
+  position: absolute;
+  top: 4%;
+  right: 4%;
+  width: 680px;
+  height: 680px;
+  transform: rotate(-24deg) scaleY(.42);
+  opacity: .9;
+}
+
+.galaxy-spiral--bottom-left { top: auto; right: auto; bottom: -6%; left: -8%; }
+
+.galaxy-arms,
+.galaxy-dust { position: absolute; inset: 0; border-radius: 50%; }
+
+.galaxy-arms {
+  background: conic-gradient(from 0deg, transparent 0, rgb(240 171 252 / .55) 7%, transparent 18%, rgb(103 232 249 / .45) 30%, transparent 42%, rgb(167 139 250 / .6) 55%, transparent 67%, rgb(244 114 182 / .45) 80%, transparent 92%);
+  -webkit-mask: radial-gradient(circle, #000 0 6%, rgb(0 0 0 / .85) 28%, transparent 68%);
+  mask: radial-gradient(circle, #000 0 6%, rgb(0 0 0 / .85) 28%, transparent 68%);
+  filter: blur(10px);
+  animation: galaxy-spin 80s linear infinite;
+}
+
+.galaxy-dust {
+  background-image:
+    radial-gradient(1.5px 1.5px at 10px 10px, #fff, transparent),
+    radial-gradient(1px 1px at 30px 45px, #f5d0fe, transparent),
+    radial-gradient(1px 1px at 52px 22px, #a5f3fc, transparent);
+  background-size: 60px 60px;
+  -webkit-mask: radial-gradient(circle, #000 10%, transparent 62%);
+  mask: radial-gradient(circle, #000 10%, transparent 62%);
+  animation: galaxy-spin 55s linear infinite;
+}
+
+.galaxy-core {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 150px;
+  height: 150px;
+  margin: -75px 0 0 -75px;
+  border-radius: 50%;
+  background: radial-gradient(circle, #fff 0, #fef3c7 14%, rgb(244 114 182 / .7) 38%, rgb(139 92 246 / .3) 55%, transparent 72%);
+  filter: blur(3px);
+  animation: galaxy-core 6s ease-in-out infinite;
+}
+
+.galaxy-shooting-star {
+  position: absolute;
+  top: 14%;
+  left: 38%;
+  width: 180px;
+  height: 2px;
+  border-radius: 2px;
+  background: linear-gradient(90deg, #fff, rgb(240 171 252 / .6) 30%, transparent);
+  opacity: 0;
+  animation: galaxy-shoot 11s ease-in infinite;
+}
+
+.galaxy-shooting-star--late { top: 52%; left: 85%; animation-delay: 6s; animation-duration: 14s; }
+
+@keyframes galaxy-drift-1 { to { background-position: 0 240px; } }
+@keyframes galaxy-drift-2 { to { background-position: 0 380px; } }
+@keyframes galaxy-drift-3 { to { background-position: 0 600px; } }
+@keyframes galaxy-twinkle { from { opacity: .45; } to { opacity: 1; } }
+@keyframes galaxy-nebula { 0%, 100% { transform: translate(0, 0) rotate(0) scale(1); } 50% { transform: translate(120px, 70px) rotate(18deg) scale(1.15); } }
+@keyframes galaxy-spin { to { transform: rotate(360deg); } }
+@keyframes galaxy-core { 0%, 100% { transform: scale(1); opacity: .9; } 50% { transform: scale(1.15); opacity: 1; } }
+@keyframes galaxy-shoot { 0%, 84% { opacity: 0; transform: rotate(-28deg) translateX(0); } 86% { opacity: 1; } 100% { opacity: 0; transform: rotate(-28deg) translateX(-620px); } }
+
+@media (max-width: 760px) {
+  .galaxy-spiral { width: 420px; height: 420px; right: -30%; }
+}
+
+/* =========================================
+   9. MOTION UTILITIES
+========================================= */
+
+@property --kuai-angle {
+  syntax: '<angle>';
+  initial-value: 0deg;
+  inherits: false;
+}
+
+/* Words rise into view one at a time */
+.kuai-word { display: inline-block; overflow: hidden; vertical-align: bottom; padding-bottom: .06em; }
+.kuai-word > span { display: inline-block; animation: kuai-rise .9s cubic-bezier(.2,.8,.2,1) both; }
+
+.kuai-fade { animation: kuai-fade 1s ease both; }
+
+/* Shimmering galaxy text */
+.kuai-shine {
+  background: linear-gradient(90deg, #f0abfc, #a78bfa, #67e8f9, #fde68a, #f0abfc);
+  background-size: 200% 100%;
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  animation: kuai-shimmer 5s linear infinite;
+}
+
+.kuai-glow-text { color: #c4b5fd; text-shadow: 0 0 40px rgb(217 70 239 / .55); }
+
+/* Rotating glowing border; set --kuai-ring-color per card */
+.kuai-ring { position: relative; isolation: isolate; }
+.kuai-ring::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  border-radius: inherit;
+  padding: 1.5px;
+  background: conic-gradient(from var(--kuai-angle), transparent 0 55%, var(--kuai-ring-color, #d946ef) 75%, transparent 90%);
+  -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+  opacity: .4;
+  pointer-events: none;
+  transition: opacity .4s;
+  animation: kuai-ring-spin 5s linear infinite;
+}
+.kuai-ring:hover::before,
+.kuai-ring:focus-within::before { opacity: 1; }
+
+.kuai-lift { transition: transform .5s cubic-bezier(.2,.8,.2,1), box-shadow .5s; }
+.kuai-lift:hover { transform: translateY(-8px); box-shadow: 0 40px 90px -35px var(--kuai-ring-color, #d946ef); }
+
+/* Photos go from grayscale to colour on hover */
+.kuai-photo img { filter: grayscale(1) contrast(1.05); transition: filter .6s, transform .8s cubic-bezier(.2,.8,.2,1); }
+.kuai-lift:hover .kuai-photo img { filter: none; transform: scale(1.06); }
+
+.kuai-float { animation: kuai-float 7s ease-in-out infinite; }
+
+.kuai-marquee { display: flex; width: max-content; animation: kuai-marquee 32s linear infinite; }
+.kuai-marquee--slow { animation-duration: 60s; }
+.kuai-outline-text { color: transparent; -webkit-text-stroke: 1.5px rgb(240 171 252 / .32); }
+
+.kuai-pulse-dot { animation: kuai-pulse 2s infinite; }
+.kuai-caret { display: inline-block; width: 2px; height: 1.1em; margin-left: 2px; vertical-align: middle; background: #22d3ee; animation: kuai-blink 1s steps(1) infinite; }
+
+.kuai-orb { background: conic-gradient(from 90deg, #d946ef, #7c3aed, #22d3ee, #f0abfc, #d946ef); animation: kuai-orb 6s ease-in-out infinite; box-shadow: 0 0 40px rgb(217 70 239 / .6), inset 0 0 0 3px rgb(255 255 255 / .2); }
+
+.kuai-gradient-button { background: linear-gradient(135deg, #d946ef, #7c3aed 55%, #22d3ee); transition: transform .3s, box-shadow .3s; }
+.kuai-gradient-button:hover { transform: translateY(-2px); box-shadow: 0 14px 40px -12px rgb(217 70 239 / .7); }
+
+/* Sections fade up as they scroll into view (where supported) */
+@supports (animation-timeline: view()) {
+  .kuai-reveal { animation: kuai-fade linear both; animation-timeline: view(); animation-range: entry 0% cover 25%; }
+}
+
+@keyframes kuai-rise { from { opacity: 0; transform: translateY(60%) skewY(4deg); } to { opacity: 1; transform: none; } }
+@keyframes kuai-fade { from { opacity: 0; transform: translateY(24px); } to { opacity: 1; transform: none; } }
+@keyframes kuai-shimmer { to { background-position: 200% 50%; } }
+@keyframes kuai-ring-spin { to { --kuai-angle: 360deg; } }
+@keyframes kuai-float { 0%, 100% { transform: translateY(0) rotate(-2deg); } 50% { transform: translateY(-14px) rotate(-1deg); } }
+@keyframes kuai-marquee { to { transform: translateX(-50%); } }
+@keyframes kuai-pulse { 0%, 100% { box-shadow: 0 0 0 0 rgb(34 211 238 / .6); } 50% { box-shadow: 0 0 0 6px rgb(34 211 238 / 0); } }
+@keyframes kuai-blink { 50% { opacity: 0; } }
+@keyframes kuai-orb { 0%, 100% { transform: scale(1); filter: hue-rotate(0deg); } 50% { transform: scale(1.08); filter: hue-rotate(40deg); } }
+
+/* 10. ACCESSIBILITY: respect reduced motion */
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation: none !important;
+    transition: none !important;
+  }
 }

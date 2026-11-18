@@ -580,7 +580,7 @@ export const portfolioData: PortfolioData = {
         en: 'Placeholder: Add the member biography and interests.',
         th: 'ข้อความตัวอย่าง: เพิ่มประวัติและความสนใจของสมาชิก',
       },
-      avatar: 'images/projects/member-3/member-3.jpg',
+      avatar: '/images/projects/member-3/member-3.jpg',
       socialLinks: { 
         github: 'https://github.com/view-ttyp', 
         linkedin: '', 
@@ -815,17 +815,29 @@ export const buildPortfolioContext = (
       lines.push(`  Age: ${member.age}`);
     }
 
-    if (member.isPlaceholder) {
+    if (!hasVerifiedName) {
       lines.push(
         '  Role, biography, skills, responsibilities, and social links are not verified. Do not present them as facts.',
       );
     } else {
+      // Introduction and biography may still hold "Placeholder:" sample text; never send that to the AI.
+      const realText = (value: string, fallback: string): string =>
+        value.trim() && !/^(placeholder|ข้อความตัวอย่าง)/i.test(value.trim())
+          ? value.trim()
+          : fallback;
+
       lines.push(`  Role (EN): ${member.roleNameI18n.en || member.roleName}`);
       lines.push(`  Role (TH): ${member.roleNameI18n.th || member.roleName}`);
-      lines.push(`  Introduction (EN): ${member.introduction.en || 'Not provided'}`);
-      lines.push(`  Introduction (TH): ${member.introduction.th || 'ยังไม่มีข้อมูล'}`);
-      lines.push(`  Biography (EN): ${member.biography.en || 'Not provided'}`);
-      lines.push(`  Biography (TH): ${member.biography.th || 'ยังไม่มีข้อมูล'}`);
+      lines.push(`  Introduction (EN): ${realText(member.introduction.en, 'Not provided')}`);
+      lines.push(`  Introduction (TH): ${realText(member.introduction.th, 'ยังไม่มีข้อมูล')}`);
+      lines.push(`  Biography (EN): ${realText(member.biography.en, 'Not provided')}`);
+      lines.push(`  Biography (TH): ${realText(member.biography.th, 'ยังไม่มีข้อมูล')}`);
+      const links = Object.entries(member.socialLinks)
+        .filter(([, url]) => typeof url === 'string' && /^https?:\/\//.test(url))
+        .map(([name, url]) => `${name}: ${url}`);
+      if (links.length > 0) {
+        lines.push(`  Links: ${links.join(', ')}`);
+      }
 
       const skills = [
         ...member.skills.core,

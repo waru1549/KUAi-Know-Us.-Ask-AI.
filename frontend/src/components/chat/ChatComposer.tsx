@@ -89,7 +89,7 @@ function ChatComposer({
           type="submit"
           disabled={!value.trim() || isLoading}
           aria-label={copy.sendMessage}
-          className="grid size-11 shrink-0 place-items-center rounded-xl bg-brand-500 text-white transition hover:bg-brand-600 disabled:cursor-not-allowed disabled:opacity-40 focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-brand-300"
+          className="grid size-11 shrink-0 place-items-center rounded-xl kuai-gradient-button text-white disabled:cursor-not-allowed disabled:opacity-40 focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-brand-300"
         >
           {isLoading ? (
             <LoaderCircle
