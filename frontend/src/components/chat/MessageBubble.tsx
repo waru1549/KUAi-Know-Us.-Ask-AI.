@@ -1,6 +1,4 @@
 
-import { Sparkles, UserRound } from 'lucide-react'
-
 import { useLanguage } from '../../contexts/language-context'
 
 import type { Language } from '../../data/portfolioData'
@@ -41,62 +39,49 @@ function MessageBubble({ message }: MessageBubbleProps) {
 
   return (
     <div
-      className={`flex w-full gap-3 ${
+      className={`kuai-message flex w-full gap-3 ${
         isUser ? 'justify-end' : 'justify-start'
       }`}
     >
       {/* AI Avatar */}
-
       {!isUser && (
         <div
-          className="grid size-9 shrink-0 place-items-center rounded-xl bg-brand-500/15 text-brand-300 ring-1 ring-brand-400/20"
+          className="grid size-9 shrink-0 place-items-center rounded-xl bg-linear-to-br from-fuchsia-500 via-violet-600 to-cyan-400 font-display text-xs font-extrabold text-white"
           aria-hidden="true"
         >
-          <Sparkles size={17} />
+          Ai
         </div>
       )}
-
-      {/* Message Content */}
 
       <div
         className={`flex min-w-0 max-w-[85%] flex-col gap-1 sm:max-w-[75%] ${
           isUser ? 'items-end' : 'items-start'
         }`}
       >
-        <span className="px-1 text-[11px] font-medium text-slate-500">
+        {/* Sender name for screen readers; the bubble style shows it visually */}
+        <span className="sr-only">
           {isUser ? copy.user : copy.assistant}
         </span>
 
         <div
-          className={`rounded-2xl px-4 py-3 ${
+          className={`px-4 py-3 ${
             isUser
-              ? 'rounded-tr-sm bg-brand-500 text-white'
-              : 'rounded-tl-sm border border-white/10 bg-surface-800 text-slate-200'
+              ? 'rounded-[20px_20px_4px_20px] bg-linear-to-br from-fuchsia-600 to-violet-600 text-white'
+              : 'rounded-[4px_20px_20px_20px] border border-white/10 bg-white/7 text-slate-100'
           }`}
         >
-          <p className="whitespace-pre-wrap wrap-break-word text-sm leading-7">
+          <p className="whitespace-pre-wrap wrap-break-word text-[15px] leading-7">
             {message.content}
           </p>
         </div>
 
         <time
           dateTime={message.createdAt}
-          className="px-1 text-[10px] text-slate-600"
+          className="px-1 text-[10px] text-slate-500"
         >
           {formattedTime}
         </time>
       </div>
-
-      {/* User Avatar */}
-
-      {isUser && (
-        <div
-          className="grid size-9 shrink-0 place-items-center rounded-xl bg-slate-700 text-slate-200"
-          aria-hidden="true"
-        >
-          <UserRound size={17} />
-        </div>
-      )}
     </div>
   )
 }

@@ -7,7 +7,7 @@ import {
 import type { FormEvent } from 'react'
 
 import {
-  ArrowUp,
+  ArrowRight,
   LoaderCircle,
 } from 'lucide-react'
 
@@ -59,9 +59,10 @@ function ChatComposer({
   return (
     <form
       onSubmit={onSubmit}
-      className="border-t border-white/10 bg-surface-900/80 p-4 sm:p-5"
+      className="border-t border-white/10 bg-ink-950/30 p-3 sm:p-4"
     >
-      <div className="flex items-end gap-3 rounded-2xl border border-border-subtle bg-ink-950 p-3 transition focus-within:border-brand-400/50">
+      <div className="flex items-end gap-2.5">
+      <div className="flex min-w-0 flex-1 items-center rounded-[26px] border border-white/10 bg-ink-950/70 px-4 transition focus-within:border-fuchsia-400/50">
         <textarea
           value={value}
           onChange={(event) => {
@@ -80,16 +81,17 @@ function ChatComposer({
           placeholder={copy.placeholder}
           aria-label={copy.inputLabel}
           aria-describedby="chat-composer-hint chat-composer-count"
-          rows={2}
+          rows={1}
           disabled={isLoading}
-          className="max-h-36 min-h-12 flex-1 resize-none bg-transparent px-2 py-2 text-sm leading-6 text-white outline-none placeholder:text-slate-600 disabled:cursor-not-allowed disabled:opacity-50"
+          className="max-h-36 min-h-[50px] flex-1 resize-none bg-transparent py-3 text-[15px] leading-6 text-white outline-none placeholder:text-slate-400 disabled:cursor-not-allowed disabled:opacity-50"
         />
+      </div>
 
         <button
           type="submit"
           disabled={!value.trim() || isLoading}
           aria-label={copy.sendMessage}
-          className="grid size-11 shrink-0 place-items-center rounded-xl bg-brand-500 text-white transition hover:bg-brand-600 disabled:cursor-not-allowed disabled:opacity-40 focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-brand-300"
+          className="grid size-[52px] shrink-0 place-items-center rounded-full kuai-gradient-button text-white disabled:cursor-not-allowed disabled:opacity-40 focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-brand-300"
         >
           {isLoading ? (
             <LoaderCircle
@@ -98,7 +100,7 @@ function ChatComposer({
               aria-hidden="true"
             />
           ) : (
-            <ArrowUp
+            <ArrowRight
               size={20}
               aria-hidden="true"
             />
@@ -106,17 +108,17 @@ function ChatComposer({
         </button>
       </div>
 
-      <div className="mt-3 flex flex-wrap items-center justify-between gap-2 px-1">
+      <div className="mt-1.5 flex items-center justify-end gap-2 px-4">
         <p
           id="chat-composer-hint"
-          className="text-[10px] text-slate-400"
+          className="sr-only"
         >
           {copy.keyboardHint}
         </p>
 
         <p
           id="chat-composer-count"
-          className="text-[10px] text-slate-400"
+          className="text-[10px] text-slate-500"
         >
           {countGraphemes(value)}/{MAX_CHAT_MESSAGE_GRAPHEMES} {copy.characterUnit}
         </p>

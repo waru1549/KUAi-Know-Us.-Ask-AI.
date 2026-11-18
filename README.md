@@ -5,7 +5,7 @@
 
 A bilingual team portfolio and AI chat application that introduces our team, showcases collaborative projects, and provides an interactive chat interface.
 
-A web application that presents our team portfolio and provides an AI-powered chat interface. The project uses React and TypeScript for the frontend, with an Express API, in-memory conversation history, and Google Gemini integration in the backend.
+A web application that presents our team portfolio and provides an AI-powered chat interface. The project uses React and TypeScript for the frontend, with an Express API, PostgreSQL conversation history, and Google Gemini integration in the backend.
 
 ## Project Status
 
@@ -26,7 +26,7 @@ A web application that presents our team portfolio and provides an AI-powered ch
 | GitHub Actions Frontend CI | Passing |
 | Production Website | Deployed |
 | Express Backend | Implemented |
-| Conversation History | In memory; cleared when the backend stops |
+| Conversation History | Stored in PostgreSQL (`conversations`, `messages`); kept 30 days |
 | Google Gemini Integration | Implemented (requires a backend API key) |
 
 ## Project Branding
@@ -37,7 +37,7 @@ A web application that presents our team portfolio and provides an AI-powered ch
 - Production Website: https://vercel.app
 
 
-> Chat requests require the backend and a Google Gemini API key. PostgreSQL is not required; public requests share a host-wide limit of 10 questions per minute.
+> Chat requests require the backend and a Google Gemini API key. PostgreSQL is required for chat history; each visitor can ask up to 10 questions per minute.
 
 ## Technology Stack
 
@@ -113,9 +113,9 @@ npm install
 
 ### 3. Configure Environment Variables
 
-Create `backend/.env` locally and set `GOOGLE_API_KEY` to a newly rotated Gemini key. PostgreSQL is not required; conversations are held in memory and disappear when the backend stops.
+Create `backend/.env` from `backend/.env.example`. Set `GOOGLE_API_KEY` to a newly rotated Gemini key and `DATABASE_URL` to a PostgreSQL database (local, or hosted on Render/Neon/Supabase with `?sslmode=require`). The backend creates its tables on start-up.
 
-The Google Gemini API key stays in the backend environment and is never sent to browsers. Public visitors can ask questions; all visitors share a limit of 10 questions per minute on the host.
+The Google Gemini API key stays in the backend environment and is never sent to browsers. Public visitors can ask questions; each visitor (by IP address) is limited to 10 questions per minute.
 
 For local development, the frontend uses the Vite proxy to connect to `http://localhost:3000` by default. No frontend environment file is required unless you need to override that configuration.
 
@@ -131,7 +131,7 @@ Run this command from the repository root. It starts the Express backend on port
 
 The backend requires PostgreSQL and the environment variables above. The frontend Vite proxy forwards `/api` requests to the backend.
 
-Chat history is held in memory by the host and in the current browser session. It is cleared when the backend or browser session ends.
+Chat messages are stored in PostgreSQL. The browser keeps a list of its own conversations in localStorage so they can be reopened after a refresh. `GET /api/health` reports whether the database is reachable; point an uptime pinger at it to keep free hosting awake.
 
 ### Share the Host with Other Networks (Temporary)
 

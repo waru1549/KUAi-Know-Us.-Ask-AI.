@@ -90,6 +90,8 @@ export interface ProjectBase {
   readonly demoUrl?: string;
   /** True means this is demonstration content, not a verified portfolio claim. */
   readonly isPlaceholder: boolean;
+  /** Show this project in the "Selected work" section of the home page. */
+  readonly isHighlighted?: boolean;
 }
 
 /** A project owned by an individual member. The array is intentionally unlimited. */
@@ -130,6 +132,10 @@ export interface DevOpsSkills {
 
 interface MemberBase {
   readonly id: MemberId;
+  /** One line on what this member built for the team project (shown on the member card). */
+  readonly mainContribution?: LocalizedText;
+  /** Up to five skills shown as chips on the member card. */
+  readonly highlightSkills?: readonly string[];
   readonly fullName: string;
   readonly nickname: string;
   readonly fullNameI18n?: LocalizedText;

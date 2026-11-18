@@ -55,12 +55,12 @@ describe('PortfolioPage Footer', () => {
     renderPortfolioPage('en')
 
     expect(
-      screen.getByText(/All rights reserved\./),
+      screen.getByText(/© \d{4} KUAi — Know Us\. Ask AI\./),
     ).toBeInTheDocument()
 
     expect(
       screen.getByText(
-        'Built with React, TypeScript & Tailwind CSS.',
+        'Built with React · Express · PostgreSQL · Gemini',
       ),
     ).toBeInTheDocument()
   })
@@ -69,12 +69,12 @@ describe('PortfolioPage Footer', () => {
     renderPortfolioPage('th')
 
     expect(
-      screen.getByText(/สงวนลิขสิทธิ์/),
+      screen.getByText(/© \d{4} KUAi — Know Us\. Ask AI\./),
     ).toBeInTheDocument()
 
     expect(
       screen.getByText(
-        'พัฒนาด้วย React, TypeScript และ Tailwind CSS',
+        'พัฒนาด้วย React · Express · PostgreSQL · Gemini',
       ),
     ).toBeInTheDocument()
   })

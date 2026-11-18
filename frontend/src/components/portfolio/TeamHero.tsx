@@ -1,6 +1,14 @@
+import {
+  useEffect,
+  useRef,
+  useState,
+  type FormEvent,
+  type CSSProperties,
+  type PointerEvent,
+} from 'react'
 
-import { ArrowUpRight, Check, Sparkles } from 'lucide-react'
-import { Link } from 'react-router'
+import { ArrowUpRight, Sparkles } from 'lucide-react'
+import { useNavigate } from 'react-router'
 
 import { useLanguage } from '../../contexts/language-context'
 import {
@@ -8,165 +16,221 @@ import {
   usePortfolioData,
 } from '../../data/portfolioData'
 
+const QUESTION_ROTATION_MS = 2600
+
 function TeamHero() {
   const { language } = useLanguage()
-  const { group, teamProjects } = usePortfolioData()
+  const { group, members } = usePortfolioData()
+  const navigate = useNavigate()
+
+  const spotlightRef = useRef<HTMLDivElement>(null)
+  const [question, setQuestion] = useState('')
+  const [questionIndex, setQuestionIndex] = useState(0)
 
   const copy =
     language === 'th'
       ? {
-          eyebrow: 'แนะนำทีมของเรา',
-          weAre: 'พวกเราคือ',
-          talkToAI: 'พูดคุยกับ AI ของเรา',
-          discover: 'มาค้นพบสิ่งที่ทำให้เราแตกต่าง',
-          featuredProject: 'โปรเจกต์เด่น',
-          collaborativeWork: 'ผลงานร่วมกันของทีม',
-          coreStrengths: 'จุดแข็งของทีมเรา',
+          askLabel: 'ถามคำถามเกี่ยวกับทีม',
+          ask: 'ถาม AI',
+          askHint: 'ตอบได้ทั้งภาษาไทยและอังกฤษ · ขับเคลื่อนด้วย Google Gemini',
+          sample: 'ตัวอย่างบทสนทนา',
+          sampleQuestion: 'ใครดูแลฐานข้อมูลของทีม?',
+          questions: [
+            'ใครเป็นคนทำ Chat UI ของทีม?',
+            'ทีมนี้ใช้ Tech Stack อะไรบ้าง?',
+            'ภูมิเคยทำโปรเจกต์อะไรมาบ้าง?',
+            'วิวดูแลส่วนไหนของโปรเจกต์?',
+          ],
         }
       : {
-          eyebrow: 'INTRODUCING OUR TEAM',
-          weAre: 'We are',
-          talkToAI: 'Talk to Our AI',
-          discover: 'Discover what makes us different.',
-          featuredProject: 'Featured Project',
-          collaborativeWork: 'COLLABORATIVE WORK',
-          coreStrengths: 'Our Core Strengths',
+          askLabel: 'Ask a question about the team',
+          ask: 'Ask AI',
+          askHint: 'Answers in Thai or English · Powered by Google Gemini',
+          sample: 'Sample conversation',
+          sampleQuestion: 'Who looks after the team database?',
+          questions: [
+            'Who built the chat UI?',
+            'What tech stack does the team use?',
+            'What has Phum built before?',
+            'Which part of the project does View own?',
+          ],
         }
 
-  // Use the first featured team project.
-  const featuredProject = teamProjects.find(
-    (project) => project.isFeatured,
-  )
+  // Rotate the example question shown in the empty ask box.
+  useEffect(() => {
+    const timer = window.setInterval(() => {
+      setQuestionIndex((current) => (current + 1) % 4)
+    }, QUESTION_ROTATION_MS)
 
-  // Keep the legacy project as a fallback.
-  const projectTitle = featuredProject
-    ? getLocalizedText(featuredProject.title, language)
-    : group.jointProject.title
+    return () => window.clearInterval(timer)
+  }, [])
 
-  const projectDescription = featuredProject
-    ? getLocalizedText(featuredProject.description, language)
-    : group.jointProject.description
+  const appFullName = group.appFullName || group.teamName
+  // The headline is the English brand slogan in both languages (Thai has no spaces to split into words).
+  const tagline = group.taglineI18n.en.trim() || group.tagline
+  const introduction = getLocalizedText(group.introduction, language)
 
-  // Read localized team content.
-  const teamName =
-    getLocalizedText(group.teamNameI18n, language) || group.teamName
+  // Split the tagline so each word can rise in on its own.
+  const taglineWords = tagline.split(/\s+/).filter(Boolean)
 
-  const tagline =
-    getLocalizedText(group.taglineI18n, language) || group.tagline
+  // Build the sample answer from real data: the backend member's name and role.
+  const backendMember = members.find((member) => member.roleKey === 'backend')
+  const sampleAnswer = (() => {
+    if (!backendMember) return ''
 
-  const strengths = group.coreStrengthsI18n
-    .map((strength) => getLocalizedText(strength, language))
-    .filter(Boolean)
+    const nickname = backendMember.nicknameI18n
+      ? getLocalizedText(backendMember.nicknameI18n, language)
+      : backendMember.nickname
+    const firstName = (backendMember.fullNameI18n
+      ? getLocalizedText(backendMember.fullNameI18n, language)
+      : backendMember.fullName
+    ).split(/\s+/)[0]
+    const role = backendMember.roleNameI18n.en || backendMember.roleName
+    const contribution = backendMember.mainContribution
+      ? getLocalizedText(backendMember.mainContribution, language)
+      : ''
+
+    return language === 'th'
+      ? `${nickname} (${firstName}) เป็น ${role}${contribution ? ` ดูแล ${contribution}` : ''}`
+      : `${nickname} (${firstName}) is our ${role}${contribution ? `, working on ${contribution}` : ''}.`
+  })()
+
+  const handlePointerMove = (event: PointerEvent<HTMLElement>) => {
+    const rect = event.currentTarget.getBoundingClientRect()
+    spotlightRef.current?.style.setProperty('--spot-x', `${event.clientX - rect.left}px`)
+    spotlightRef.current?.style.setProperty('--spot-y', `${event.clientY - rect.top}px`)
+  }
+
+  const handleAsk = (event: FormEvent<HTMLFormElement>) => {
+    event.preventDefault()
+    const text = question.trim() || copy.questions[questionIndex]
+    navigate(`/chat?q=${encodeURIComponent(text)}`)
+  }
 
   return (
     <section
       aria-labelledby="team-hero-title"
-      className="relative isolate overflow-hidden px-5 py-20 sm:py-28 lg:px-8"
+      onPointerMove={handlePointerMove}
+      className="relative isolate flex min-h-[calc(100vh-73px)] items-center overflow-hidden px-5 py-20 sm:py-28 lg:px-8"
     >
-      {/* Background glow */}
+      {/* Spotlight that follows the pointer */}
       <div
+        ref={spotlightRef}
         aria-hidden="true"
-        className="pointer-events-none absolute -left-40 top-10 -z-10 size-96 rounded-full bg-brand-500/10 blur-[120px]"
+        className="pointer-events-none absolute inset-0 -z-10"
+        style={{
+          background:
+            'radial-gradient(520px circle at var(--spot-x, 70%) var(--spot-y, 35%), rgb(240 171 252 / 0.14), transparent 60%)',
+        }}
       />
 
-      <div
-        aria-hidden="true"
-        className="pointer-events-none absolute -right-40 bottom-0 -z-10 size-96 rounded-full bg-accent-cyan/5 blur-[120px]"
-      />
+      <div className="mx-auto grid w-full max-w-7xl items-center gap-14 lg:grid-cols-[1.4fr_0.6fr]">
+        <div className="min-w-0">
+          <p className="kuai-fade inline-flex items-center gap-2 rounded-full border border-accent-magenta/30 bg-fuchsia-500/10 px-4 py-2 font-mono text-xs tracking-[0.2em] text-accent-magenta">
+            <Sparkles size={14} aria-hidden="true" />
+            {appFullName.toUpperCase()}
+          </p>
 
-      <div className="mx-auto max-w-7xl">
-        {/* Main Hero */}
-        <div className="grid items-center gap-14 lg:grid-cols-[1.15fr_0.85fr] lg:gap-16">
+          <h1
+            id="team-hero-title"
+            className="mt-8 font-display text-5xl font-extrabold uppercase leading-[0.92] tracking-[-0.045em] text-white sm:text-7xl lg:text-8xl xl:text-[8rem]"
+          >
+            {taglineWords.map((word, index) => {
+              const isLast = index === taglineWords.length - 1
+              const isSecondLine = index >= Math.ceil(taglineWords.length / 2)
 
-          {/* Left: Team Introduction */}
-          <div>
-            <div className="inline-flex items-center gap-2 rounded-full border border-brand-400/20 bg-brand-500/10 px-4 py-2 text-xs font-semibold tracking-[0.16em] text-brand-300">
-              <Sparkles size={14} />
-              {copy.eyebrow}
-            </div>
+              return (
+                <span key={`${index}-${word}`} className="kuai-word">
+                  <span
+                    className={isLast ? 'kuai-shine' : isSecondLine ? 'kuai-glow-text' : undefined}
+                    style={{ animationDelay: `${0.05 + index * 0.1}s` }}
+                  >
+                    {word}
+                    {!isLast && ' '}
+                  </span>
+                </span>
+              )
+            })}
+          </h1>
 
-            <h1
-              id="team-hero-title"
-              className="mt-7 max-w-3xl font-display text-5xl font-semibold leading-[1.12] tracking-tight text-white sm:text-6xl lg:text-7xl"
+          {introduction && (
+            <p
+              className="kuai-fade mt-8 max-w-2xl text-base leading-8 text-slate-300 sm:text-lg"
+              style={{ animationDelay: '0.7s' }}
             >
-              {copy.weAre}
-
-              <span className="mt-2 block bg-linear-to-r from-brand-300 via-brand-400 to-accent-cyan bg-clip-text text-transparent">
-                {teamName}.
-              </span>
-            </h1>
-
-            <p className="mt-7 max-w-2xl text-base leading-8 text-slate-300 sm:text-lg">
-              {tagline}
+              {introduction}
             </p>
+          )}
 
-            {/* CTA */}
-            <div className="mt-9 flex flex-wrap items-center gap-4">
-              <Link
-                to="/chat"
-                className="inline-flex items-center gap-2 rounded-full bg-brand-600 px-6 py-3.5 text-sm font-semibold text-white shadow-lg shadow-brand-500/20 transition hover:-translate-y-0.5 hover:bg-brand-700 focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-brand-300"
-              >
-                {copy.talkToAI}
-                <ArrowUpRight size={17} />
-              </Link>
+          {/* Ask the AI straight from the hero */}
+          <form
+            onSubmit={handleAsk}
+            className="kuai-fade mt-10 max-w-2xl"
+            style={{ animationDelay: '0.85s' }}
+          >
+            <label htmlFor="hero-question" className="sr-only">
+              {copy.askLabel}
+            </label>
 
-              <span className="text-sm text-slate-400">
-                {copy.discover}
-              </span>
-            </div>
-          </div>
-
-          {/* Right: Featured Project Card */}
-          <div className="relative">
             <div
-              aria-hidden="true"
-              className="absolute -inset-4 -z-10 rounded-4xl bg-linear-to-r from-brand-500/15 via-transparent to-accent-cyan/10 blur-2xl"
-            />
+              className="kuai-ring kuai-glass flex items-center gap-3 rounded-full border border-white/10 bg-surface-900 py-2 pl-5 pr-2 shadow-glow"
+              style={{ '--kuai-ring-color': '#22d3ee' } as CSSProperties}
+            >
+              <Sparkles size={20} className="shrink-0 text-accent-magenta" aria-hidden="true" />
 
-            <article className="rounded-panel border border-border-subtle bg-surface-900/90 p-7 shadow-glow backdrop-blur-xl sm:p-9">
-              <div className="flex items-center justify-between gap-3">
-                <span className="text-xs font-semibold uppercase tracking-[0.18em] text-brand-300">
-                  {copy.featuredProject}
-                </span>
+              <input
+                id="hero-question"
+                type="text"
+                value={question}
+                maxLength={2000}
+                onChange={(event) => setQuestion(event.target.value)}
+                placeholder={copy.questions[questionIndex]}
+                className="h-11 min-w-0 flex-1 bg-transparent text-base text-white outline-none placeholder:text-slate-400"
+              />
 
-                <span className="rounded-full border border-accent-cyan/20 bg-accent-cyan/10 px-3 py-1 text-[10px] font-semibold text-accent-cyan">
-                  {copy.collaborativeWork}
-                </span>
-              </div>
+              <button
+                type="submit"
+                className="kuai-gradient-button inline-flex min-h-12 shrink-0 items-center gap-2 rounded-full px-5 text-sm font-semibold text-white focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-accent-magenta"
+              >
+                {copy.ask}
+                <ArrowUpRight size={16} aria-hidden="true" />
+              </button>
+            </div>
 
-              <h2 className="mt-8 font-display text-3xl font-semibold leading-tight text-white">
-                {projectTitle}
-              </h2>
+            <p className="mt-3 pl-5 text-xs text-slate-400">{copy.askHint}</p>
+          </form>
 
-              <p className="mt-5 text-sm leading-7 text-slate-400">
-                {projectDescription}
-              </p>
+        </div>
 
-              <div className="mt-8 border-t border-border-subtle pt-7">
-                <h3 className="text-xs font-semibold uppercase tracking-[0.18em] text-slate-400">
-                  {copy.coreStrengths}
-                </h3>
-
-                <div className="mt-5 space-y-4">
-                  {strengths.map((strength, index) => (
-                    <div
-                      key={`${index}-${strength}`}
-                      className="flex items-start gap-3"
-                    >
-                      <span className="mt-0.5 grid size-5 shrink-0 place-items-center rounded-full bg-brand-500/15 text-brand-300">
-                        <Check size={12} />
-                      </span>
-
-                      <p className="text-sm leading-6 text-slate-300">
-                        {strength}
-                      </p>
-                    </div>
-                  ))}
+        {/* Floating sample conversation */}
+        {sampleAnswer && (
+          <aside
+            aria-label={copy.sample}
+            className="kuai-fade hidden lg:block"
+            style={{ animationDelay: '1s' }}
+          >
+            <div className="kuai-float kuai-glass rounded-[1.75rem] border border-white/12 bg-white/6 p-6 shadow-2xl">
+              <div className="flex items-center gap-3 border-b border-white/10 pb-4">
+                <span className="grid size-9 place-items-center rounded-xl bg-linear-to-br from-fuchsia-500 via-violet-600 to-cyan-400 font-display text-xs font-extrabold text-white" aria-hidden="true">Ai</span>
+                <div>
+                  <p className="text-sm font-semibold text-white">KUAi Assistant</p>
+                  <p className="text-xs text-accent-cyan">{copy.sample}</p>
                 </div>
               </div>
-            </article>
-          </div>
-        </div>
+
+              <div className="flex flex-col gap-3 pt-4 text-sm leading-6">
+                <p className="max-w-[85%] self-end rounded-[18px_18px_4px_18px] bg-linear-to-br from-fuchsia-600 to-violet-600 px-4 py-2.5 text-white">
+                  {copy.sampleQuestion}
+                </p>
+                <p className="max-w-[90%] rounded-[18px_18px_18px_4px] border border-white/10 bg-white/8 px-4 py-3 text-slate-200">
+                  {sampleAnswer}
+                  <span className="kuai-caret" aria-hidden="true" />
+                </p>
+              </div>
+
+            </div>
+          </aside>
+        )}
       </div>
     </section>
   )

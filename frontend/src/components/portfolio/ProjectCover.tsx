@@ -27,7 +27,7 @@ function ProjectCover({
           src={imageSrc}
           alt={alt}
           loading="lazy"
-          className="size-full object-cover"
+          className="size-full object-cover transition duration-1000 ease-out group-hover:scale-105"
           onError={() => setFailedImage(imageSrc)}
         />
       ) : (

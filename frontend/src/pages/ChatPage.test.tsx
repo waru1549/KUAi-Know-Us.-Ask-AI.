@@ -131,13 +131,13 @@ describe('ChatPage Component', () => {
 
     expect(
       screen.getByRole('heading', {
-        name: 'ผู้ช่วย AI ประจำทีม',
+        name: 'KUAi Assistant',
       }),
     ).toBeInTheDocument()
 
     expect(
       screen.getByRole('heading', {
-        name: 'วันนี้ให้เราช่วยอะไรได้บ้าง?',
+        name: 'สวัสดีครับ ผมคือผู้ช่วย AI ของทีม KUAi ถามได้เลยว่าอยากรู้อะไรเกี่ยวกับไอซ์ ภูมิ หรือวิว',
       }),
     ).toBeInTheDocument()
 
@@ -153,9 +153,6 @@ describe('ChatPage Component', () => {
       }),
     ).toBeInTheDocument()
 
-    expect(
-      screen.getByText('GOOGLE GEMINI'),
-    ).toBeInTheDocument()
   })
 
   it('should open the Thai conversation history panel', async () => {
@@ -175,7 +172,7 @@ describe('ChatPage Component', () => {
 
     await user.click(
       screen.getByRole('button', {
-        name: 'ใครเป็นสมาชิกในทีมนี้บ้าง?',
+        name: 'ใครเป็นสมาชิกในทีมบ้าง?',
       }),
     )
 
@@ -183,7 +180,7 @@ describe('ChatPage Component', () => {
       screen.getByRole('textbox', {
         name: 'พิมพ์ข้อความของคุณ',
       }),
-    ).toHaveValue('ใครเป็นสมาชิกในทีมนี้บ้าง?')
+    ).toHaveValue('ใครเป็นสมาชิกในทีมบ้าง?')
 
     expect(mockSendChatMessage).not.toHaveBeenCalled()
   })
@@ -251,13 +248,13 @@ describe('ChatPage Component', () => {
 
     expect(
       screen.getByRole('heading', {
-        name: 'How can we help you?',
+        name: 'Hi! I am the KUAi team AI assistant. Ask me anything about Ice, Phum or View.',
       }),
     ).toBeInTheDocument()
 
     expect(
       screen.getByRole('button', {
-        name: 'Who are the members of this team?',
+        name: 'Who are the team members?',
       }),
     ).toBeInTheDocument()
 
@@ -275,7 +272,7 @@ describe('ChatPage Component', () => {
 
     await user.click(
       screen.getByRole('button', {
-        name: 'Who are the members of this team?',
+        name: 'Who are the team members?',
       }),
     )
 
@@ -283,7 +280,7 @@ describe('ChatPage Component', () => {
       screen.getByRole('textbox', {
         name: 'Type your message',
       }),
-    ).toHaveValue('Who are the members of this team?')
+    ).toHaveValue('Who are the team members?')
 
     // Clicking a suggestion must not send it automatically.
     expect(mockSendChatMessage).not.toHaveBeenCalled()
@@ -494,7 +491,7 @@ describe('ChatPage Component', () => {
     // Empty State returns
     expect(
       screen.getByRole('heading', {
-        name: 'How can we help you?',
+        name: 'Hi! I am the KUAi team AI assistant. Ask me anything about Ice, Phum or View.',
       }),
     ).toBeInTheDocument()
 

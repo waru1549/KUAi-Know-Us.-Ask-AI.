@@ -1,17 +1,39 @@
+import { useEffect, useState } from 'react'
+import { Link, useMatch } from 'react-router'
 
-import { useState } from 'react'
-import { Link, NavLink } from 'react-router'
-
-import {
-  Menu,
-  MessageCircle,
-  Sparkles,
-  UserRound,
-  X,
-} from 'lucide-react'
+import { ArrowLeft, ArrowUpRight, Menu, X } from 'lucide-react'
 
 import { useLanguage } from '../../contexts/language-context'
+import KuaiLogo from './KuaiLogo'
 import type { Language } from '../../data/portfolioData'
+
+const API_BASE_URL = (import.meta.env.VITE_API_BASE_URL?.trim() ?? '').replace(/\/+$/, '')
+
+type ApiStatus = 'checking' | 'online' | 'offline'
+
+/** Asks the backend once whether the API and database are reachable. */
+function useApiStatus(): ApiStatus {
+  const [status, setStatus] = useState<ApiStatus>('checking')
+
+  useEffect(() => {
+    // Test environments may not provide fetch.
+    if (typeof fetch !== 'function') return
+
+    const controller = new AbortController()
+
+    fetch(`${API_BASE_URL}/api/health`, { signal: controller.signal })
+      .then((response) => {
+        if (!controller.signal.aborted) setStatus(response.ok ? 'online' : 'offline')
+      })
+      .catch(() => {
+        if (!controller.signal.aborted) setStatus('offline')
+      })
+
+    return () => controller.abort()
+  }, [])
+
+  return status
+}
 
 interface LanguageSwitcherProps {
   language: Language
@@ -26,15 +48,12 @@ const languageOptions: readonly {
   { value: 'th', label: 'TH' },
 ]
 
-function LanguageSwitcher({
-  language,
-  onChange,
-}: LanguageSwitcherProps) {
+function LanguageSwitcher({ language, onChange }: LanguageSwitcherProps) {
   return (
     <div
       role="group"
       aria-label={language === 'th' ? 'เลือกภาษา' : 'Select language'}
-      className="inline-flex items-center gap-1 rounded-full border border-white/10 bg-white/5 p-1"
+      className="inline-flex items-center gap-0.5 rounded-full border border-white/10 bg-white/5 p-1"
     >
       {languageOptions.map((option) => {
         const isActive = language === option.value
@@ -50,10 +69,10 @@ function LanguageSwitcher({
                 : 'เปลี่ยนภาษาเป็นภาษาไทย'
             }
             onClick={() => onChange(option.value)}
-            className={`min-w-10 rounded-full px-3 py-2 text-xs font-bold transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-300 ${
+            className={`min-h-8 min-w-9 rounded-full px-2.5 text-[11px] font-bold transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent-magenta ${
               isActive
-                ? 'bg-brand-500 text-white shadow-lg shadow-brand-500/20'
-                : 'text-slate-400 hover:bg-white/10 hover:text-white'
+                ? 'bg-linear-to-r from-fuchsia-500 to-violet-600 text-white'
+                : 'text-slate-400 hover:text-white'
             }`}
           >
             {option.label}
@@ -64,105 +83,136 @@ function LanguageSwitcher({
   )
 }
 
-function Navbar() {
-  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
-
-  const { language, setLanguage } = useLanguage()
-
-  const copy =
-    language === 'th'
-      ? {
-          portfolio: 'ผลงานทีม',
-          aiChat: 'แชต AI',
-          mainNavigation: 'เมนูหลัก',
-          mobileNavigation: 'เมนูสำหรับมือถือ',
-          openMenu: 'เปิดเมนูนำทาง',
-          closeMenu: 'ปิดเมนูนำทาง',
-        }
-      : {
-          portfolio: 'Portfolio',
-          aiChat: 'AI Chat',
-          mainNavigation: 'Main navigation',
-          mobileNavigation: 'Mobile navigation',
-          openMenu: 'Open navigation menu',
-          closeMenu: 'Close navigation menu',
-        }
-
-  const navLinkClass = ({ isActive }: { isActive: boolean }) =>
-    `inline-flex items-center gap-2 rounded-full px-4 py-2 text-sm font-medium transition-colors focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-brand-300 ${
-      isActive
-        ? 'bg-white/10 text-white'
-        : 'text-slate-400 hover:bg-white/5 hover:text-white'
-    }`
-
-  const closeMobileMenu = () => {
-    setIsMobileMenuOpen(false)
-  }
+function StatusBadge({ status, label }: { status: ApiStatus; label: string }) {
+  const dotClass =
+    status === 'online'
+      ? 'kuai-pulse-dot bg-accent-cyan'
+      : status === 'offline'
+        ? 'bg-slate-500'
+        : 'bg-slate-500 animate-pulse'
 
   return (
-    <header className="sticky top-0 z-50 border-b border-white/10 bg-ink-950/85 backdrop-blur-xl">
-      <div className="mx-auto flex max-w-7xl items-center justify-between px-5 py-4 lg:px-8">
+    <span
+      className={`inline-flex items-center gap-2 font-mono text-[11px] tracking-[0.12em] ${
+        status === 'online' ? 'text-sky-300' : 'text-slate-400'
+      }`}
+    >
+      <span className={`size-[7px] rounded-full ${dotClass}`} aria-hidden="true" />
+      {label}
+    </span>
+  )
+}
+
+function Navbar() {
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
+  const { language, setLanguage } = useLanguage()
+  const isChatPage = useMatch('/chat') !== null
+  const apiStatus = useApiStatus()
+
+  const isThai = language === 'th'
+
+  const copy = isThai
+    ? {
+        team: 'ทีมของเรา',
+        work: 'ผลงาน',
+        contact: 'ติดต่อ',
+        chat: 'คุยกับ AI',
+        back: 'กลับหน้า Portfolio',
+        mainNavigation: 'เมนูหลัก',
+        mobileNavigation: 'เมนูสำหรับมือถือ',
+        openMenu: 'เปิดเมนูนำทาง',
+        closeMenu: 'ปิดเมนูนำทาง',
+        language: 'เลือกภาษา',
+      }
+    : {
+        team: 'Team',
+        work: 'Work',
+        contact: 'Contact',
+        chat: 'Talk to AI',
+        back: 'Back to portfolio',
+        mainNavigation: 'Main navigation',
+        mobileNavigation: 'Mobile navigation',
+        openMenu: 'Open navigation menu',
+        closeMenu: 'Close navigation menu',
+        language: 'Language',
+      }
+
+  const statusWord =
+    apiStatus === 'online' ? 'ONLINE' : apiStatus === 'offline' ? 'OFFLINE' : '…'
+  const statusLabel = isChatPage ? `GEMINI · ${statusWord}` : `AI ${statusWord}`
+
+  // Section links point at the home page so they also work from a member profile.
+  const sectionLinks = [
+    { href: '/#members', label: copy.team },
+    { href: '/#projects', label: copy.work },
+    { href: '/#contact', label: copy.contact },
+  ]
+
+  const closeMobileMenu = () => setIsMobileMenuOpen(false)
+
+  return (
+    <header className="sticky top-0 z-50 border-b border-white/[0.06] bg-ink-950/20 backdrop-blur-md backdrop-saturate-150">
+      <div className="mx-auto flex max-w-7xl items-center justify-between gap-4 px-5 py-4 lg:px-8">
         {/* Brand */}
         <Link
           to="/"
           onClick={closeMobileMenu}
-          aria-label="Team Portfolio AI home"
-          className="flex items-center gap-3"
+          aria-label="KUAi home"
+          className="rounded-lg focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-accent-magenta"
         >
-          <span className="grid size-10 place-items-center rounded-xl bg-brand-500/15 text-brand-300 ring-1 ring-brand-400/20">
-            <Sparkles size={21} />
-          </span>
-
-          <span className="flex flex-col gap-0.5">
-            <span className="text-sm font-bold tracking-wide text-white">
-              TEAM PORTFOLIO
-            </span>
-
-            <span className="text-[10px] font-semibold tracking-[0.2em] text-brand-300">
-              AI EXPERIENCE
-            </span>
-          </span>
+          <KuaiLogo className="h-10 w-auto sm:h-11" showTagline={false} />
         </Link>
 
         {/* Desktop Navigation */}
-        <div className="hidden items-center gap-3 md:flex">
-          <nav
-            aria-label={copy.mainNavigation}
-            className="flex items-center gap-2"
-          >
-            <NavLink to="/" end className={navLinkClass}>
-              <UserRound size={16} />
-              {copy.portfolio}
-            </NavLink>
+        <nav
+          aria-label={copy.mainNavigation}
+          className="hidden items-center gap-7 text-sm md:flex"
+        >
+          {isChatPage ? (
+            <Link
+              to="/"
+              className="inline-flex min-h-11 items-center gap-2 text-slate-300 transition hover:text-white"
+            >
+              <ArrowLeft size={16} aria-hidden="true" />
+              {copy.back}
+            </Link>
+          ) : (
+            sectionLinks.map((link) => (
+              <a
+                key={link.href}
+                href={link.href}
+                className="text-slate-300 transition hover:text-white"
+              >
+                {link.label}
+              </a>
+            ))
+          )}
 
-            <NavLink to="/chat" className={navLinkClass}>
-              <MessageCircle size={16} />
-              {copy.aiChat}
-            </NavLink>
-          </nav>
+          <StatusBadge status={apiStatus} label={statusLabel} />
 
-          <LanguageSwitcher
-            language={language}
-            onChange={setLanguage}
-          />
-        </div>
+          <LanguageSwitcher language={language} onChange={setLanguage} />
+
+          {!isChatPage && (
+            <Link
+              to="/chat"
+              className="inline-flex min-h-11 items-center gap-2 rounded-full bg-[#f4f2ff] px-5 font-semibold text-[#0b0620] transition hover:-translate-y-0.5 hover:shadow-[0_12px_40px_-10px_rgb(217_70_239/0.8)]"
+            >
+              {copy.chat}
+              <ArrowUpRight size={16} aria-hidden="true" />
+            </Link>
+          )}
+        </nav>
 
         {/* Mobile Menu Toggle */}
         <button
           type="button"
-          aria-label={
-            isMobileMenuOpen ? copy.closeMenu : copy.openMenu
-          }
+          aria-label={isMobileMenuOpen ? copy.closeMenu : copy.openMenu}
           aria-expanded={isMobileMenuOpen}
           aria-controls="mobile-navigation"
           onClick={() => setIsMobileMenuOpen((previous) => !previous)}
-          className="grid size-10 place-items-center rounded-xl border border-white/10 text-slate-300 transition hover:bg-white/10 hover:text-white focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-brand-300 md:hidden"
+          className="grid size-11 place-items-center rounded-xl border border-white/10 text-slate-300 transition hover:bg-white/10 hover:text-white focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-accent-magenta md:hidden"
         >
-          {isMobileMenuOpen ? (
-            <X size={21} />
-          ) : (
-            <Menu size={21} />
-          )}
+          {isMobileMenuOpen ? <X size={21} /> : <Menu size={21} />}
         </button>
       </div>
 
@@ -173,43 +223,42 @@ function Navbar() {
           aria-label={copy.mobileNavigation}
           className="border-t border-white/10 px-5 py-4 md:hidden"
         >
-          <div className="mx-auto flex max-w-7xl flex-col gap-2">
-            <NavLink
-              to="/"
-              end
-              onClick={closeMobileMenu}
-              className={({ isActive }) =>
-                `flex items-center gap-3 rounded-xl px-4 py-3 text-sm font-medium transition ${
-                  isActive
-                    ? 'bg-brand-500/15 text-brand-300'
-                    : 'text-slate-400 hover:bg-white/5 hover:text-white'
-                }`
-              }
-            >
-              <UserRound size={18} />
-              {copy.portfolio}
-            </NavLink>
+          <div className="mx-auto flex max-w-7xl flex-col gap-1">
+            {isChatPage ? (
+              <Link
+                to="/"
+                onClick={closeMobileMenu}
+                className="flex min-h-11 items-center gap-3 rounded-xl px-4 text-sm text-slate-200 hover:bg-white/5"
+              >
+                <ArrowLeft size={18} aria-hidden="true" />
+                {copy.back}
+              </Link>
+            ) : (
+              <>
+                {sectionLinks.map((link) => (
+                  <a
+                    key={link.href}
+                    href={link.href}
+                    onClick={closeMobileMenu}
+                    className="flex min-h-11 items-center rounded-xl px-4 text-sm text-slate-200 hover:bg-white/5"
+                  >
+                    {link.label}
+                  </a>
+                ))}
 
-            <NavLink
-              to="/chat"
-              onClick={closeMobileMenu}
-              className={({ isActive }) =>
-                `flex items-center gap-3 rounded-xl px-4 py-3 text-sm font-medium transition ${
-                  isActive
-                    ? 'bg-brand-500/15 text-brand-300'
-                    : 'text-slate-400 hover:bg-white/5 hover:text-white'
-                }`
-              }
-            >
-              <MessageCircle size={18} />
-              {copy.aiChat}
-            </NavLink>
+                <Link
+                  to="/chat"
+                  onClick={closeMobileMenu}
+                  className="kuai-gradient-button mt-2 flex min-h-11 items-center justify-between rounded-xl px-4 text-sm font-semibold text-white"
+                >
+                  {copy.chat}
+                  <ArrowUpRight size={16} aria-hidden="true" />
+                </Link>
+              </>
+            )}
 
-            {/* Mobile Language Switcher */}
-            <div className="mt-3 border-t border-white/10 pt-4">
-              <p className="mb-3 text-xs font-medium text-slate-500">
-                {language === 'th' ? 'เลือกภาษา' : 'Language'}
-              </p>
+            <div className="mt-3 flex items-center justify-between border-t border-white/10 pt-4">
+              <StatusBadge status={apiStatus} label={statusLabel} />
 
               <LanguageSwitcher
                 language={language}

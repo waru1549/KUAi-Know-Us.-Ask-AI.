@@ -9,14 +9,13 @@ import {
 import {
   AlertCircle,
   History,
-  MessageCircle,
   MoreHorizontal,
   Plus,
   RefreshCw,
-  Sparkles,
   Trash2,
-  Users,
 } from 'lucide-react'
+
+import { useSearchParams } from 'react-router'
 
 import Navbar from '../components/layout/Navbar'
 import { useLanguage } from '../contexts/language-context'
@@ -44,7 +43,6 @@ interface ChatPageCopy {
   emptyHistory: string
   moreActions: string
   deleteChat: string
-  aiProvider: string
   conversationLabel: string
   messagesLabel: string
   emptyTitle: string
@@ -59,26 +57,26 @@ interface ChatPageCopy {
 
 const chatPageCopy: Record<Language, ChatPageCopy> = {
   en: {
-    title: 'Team AI Assistant',
+    title: 'KUAi Assistant',
     description:
-      'Discover our team, members, skills, and projects.',
+      'Ask about our members, skills and projects · Answers in Thai or English',
     newChat: 'New Chat',
     newChatAria: 'Start a new conversation',
     history: 'History',
     emptyHistory: 'No saved conversations in this browser.',
     moreActions: 'More actions',
     deleteChat: 'Delete conversation',
-    aiProvider: 'GOOGLE GEMINI',
     conversationLabel: 'Chat conversation',
     messagesLabel: 'Chat conversation messages',
-    emptyTitle: 'How can we help you?',
+    emptyTitle: 'Hi! I am the KUAi team AI assistant. Ask me anything about Ice, Phum or View.',
     emptyDescription:
       'Ask questions about our team members, technical skills, previous projects, or collaborative work.',
-    tryAsking: 'TRY ASKING',
+    tryAsking: 'Try asking',
     suggestedPrompts: [
-      'Who are the members of this team?',
-      'What are your team skills?',
-      'Tell me about your collaborative project.',
+      'Who are the team members?',
+      'What tech stack does the team use?',
+      'What does Phum work on in this project?',
+      'Who designed the UI?',
     ],
     errorTitle: 'Unable to get AI response',
     genericError: 'Something went wrong. Please try again.',
@@ -87,26 +85,26 @@ const chatPageCopy: Record<Language, ChatPageCopy> = {
   },
 
   th: {
-    title: 'ผู้ช่วย AI ประจำทีม',
+    title: 'KUAi Assistant',
     description:
-      'ค้นพบข้อมูลเกี่ยวกับทีม สมาชิก ทักษะ และผลงานของเรา',
+      'ถามเรื่องสมาชิก ทักษะ และผลงานของทีม · ตอบได้ทั้งไทยและอังกฤษ',
     newChat: 'แชตใหม่',
     newChatAria: 'เริ่มบทสนทนาใหม่',
     history: 'ประวัติแชต',
     emptyHistory: 'ยังไม่มีประวัติแชตในเบราว์เซอร์นี้',
     moreActions: 'ตัวเลือกเพิ่มเติม',
     deleteChat: 'ลบแชตนี้',
-    aiProvider: 'GOOGLE GEMINI',
     conversationLabel: 'บทสนทนา',
     messagesLabel: 'ข้อความในการสนทนา',
-    emptyTitle: 'วันนี้ให้เราช่วยอะไรได้บ้าง?',
+    emptyTitle: 'สวัสดีครับ ผมคือผู้ช่วย AI ของทีม KUAi ถามได้เลยว่าอยากรู้อะไรเกี่ยวกับไอซ์ ภูมิ หรือวิว',
     emptyDescription:
       'สอบถามเกี่ยวกับสมาชิกในทีม ทักษะทางเทคนิค ผลงานที่ผ่านมา หรือโปรเจกต์ที่เราทำร่วมกัน',
-    tryAsking: 'ลองถามเราได้เลย',
+    tryAsking: 'ลองถามดู',
     suggestedPrompts: [
-      'ใครเป็นสมาชิกในทีมนี้บ้าง?',
-      'ทีมของเรามีทักษะอะไรบ้าง?',
-      'เล่าเกี่ยวกับโปรเจกต์ที่ทีมทำร่วมกันให้ฟังหน่อย',
+      'ใครเป็นสมาชิกในทีมบ้าง?',
+      'ทีมใช้ Tech Stack อะไร?',
+      'ภูมิทำอะไรในโปรเจกต์นี้?',
+      'Who designed the UI?',
     ],
     errorTitle: 'ไม่สามารถรับคำตอบจาก AI ได้',
     genericError: 'เกิดข้อผิดพลาด กรุณาลองอีกครั้ง',
@@ -119,6 +117,34 @@ interface SavedConversation {
   readonly conversationId: string
   readonly title: string
   readonly updatedAt: string
+}
+
+const CHAT_HISTORY_STORAGE_KEY = 'team-portfolio-ai-chat-history-v1'
+const MAX_SAVED_CONVERSATIONS = 30
+
+function isSavedConversation(value: unknown): value is SavedConversation {
+  return (
+    typeof value === 'object' &&
+    value !== null &&
+    typeof (value as SavedConversation).conversationId === 'string' &&
+    typeof (value as SavedConversation).title === 'string' &&
+    typeof (value as SavedConversation).updatedAt === 'string'
+  )
+}
+
+// Read the conversation list this browser saved earlier (the messages themselves live in the backend database).
+function loadSavedConversations(): SavedConversation[] {
+  try {
+    const parsed: unknown = JSON.parse(
+      window.localStorage.getItem(CHAT_HISTORY_STORAGE_KEY) ?? '[]',
+    )
+
+    return Array.isArray(parsed)
+      ? parsed.filter(isSavedConversation).slice(0, MAX_SAVED_CONVERSATIONS)
+      : []
+  } catch {
+    return []
+  }
 }
 
 function ChatPage() {
@@ -137,7 +163,7 @@ function ChatPage() {
   // Conversation State
   const [conversationId, setConversationId] = useState<string | null>(null)
   const [savedConversations, setSavedConversations] =
-    useState<SavedConversation[]>([])
+    useState<SavedConversation[]>(loadSavedConversations)
   const [isHistoryOpen, setIsHistoryOpen] = useState(false)
   const [openMenuId, setOpenMenuId] = useState<string | null>(null)
 
@@ -149,6 +175,29 @@ function ChatPage() {
 
   // Scroll Reference
   const bottomRef = useRef<HTMLDivElement>(null)
+
+  // A question asked from the portfolio hero arrives as /chat?q=...
+  const [searchParams] = useSearchParams()
+  const questionFromUrl = searchParams.get('q')
+  const [appliedQuestion, setAppliedQuestion] = useState<string | null>(null)
+
+  // Prefill the composer once per new question (derived state, updated during render).
+  if (questionFromUrl && questionFromUrl !== appliedQuestion) {
+    setAppliedQuestion(questionFromUrl)
+    setInput(questionFromUrl.slice(0, 2000))
+  }
+
+  // Keep the conversation list after a page refresh.
+  useEffect(() => {
+    try {
+      window.localStorage.setItem(
+        CHAT_HISTORY_STORAGE_KEY,
+        JSON.stringify(savedConversations.slice(0, MAX_SAVED_CONVERSATIONS)),
+      )
+    } catch {
+      // Storage can be full or blocked (private mode); history then lasts for this visit only.
+    }
+  }, [savedConversations])
 
   // Automatically scroll to the latest message
   useEffect(() => {
@@ -306,6 +355,12 @@ const handleNewConversation = () => {
       setIsHistoryOpen(false)
       setOpenMenuId(null)
     } catch (err: unknown) {
+      // The server no longer has this conversation: drop it from the saved list.
+      if (err instanceof ChatApiException && err.status === 404) {
+        setSavedConversations((current) => current.filter(
+          (conversation) => conversation.conversationId !== savedConversation.conversationId,
+        ))
+      }
       setError(err instanceof Error ? err.message : copy.genericError)
     } finally {
       setIsLoading(false)
@@ -317,7 +372,12 @@ const handleNewConversation = () => {
     setError(null)
 
     try {
-      await deleteChatConversation(savedConversation.conversationId)
+      try {
+        await deleteChatConversation(savedConversation.conversationId)
+      } catch (err: unknown) {
+        // Already gone on the server (e.g. expired): still remove it here.
+        if (!(err instanceof ChatApiException && err.status === 404)) throw err
+      }
       const updatedConversations = savedConversations.filter(
         (conversation) => conversation.conversationId !== savedConversation.conversationId,
       )
@@ -342,32 +402,28 @@ const handleNewConversation = () => {
   }
 
   return (
-    <div className="min-h-screen bg-ink-950 text-white">
+    <div className="flex h-dvh flex-col overflow-hidden bg-transparent text-white">
 
       <Navbar />
 
-      <main className="mx-auto flex min-h-[calc(100vh-73px)] w-full max-w-5xl flex-col px-4 py-8 sm:px-6 lg:px-8">
+      <main className="mx-auto flex min-h-0 w-full max-w-5xl flex-1 flex-col px-4 py-4 sm:px-6 sm:py-6 lg:px-8">
 
         {/* Chat Header */}
 
-        <header className="mb-6 flex flex-wrap items-center justify-between gap-4">
+        <header className="mb-4 flex shrink-0 flex-wrap items-center justify-between gap-4">
 
-          <div>
-            <div className="flex items-center gap-2">
+          <div className="flex items-center gap-4">
+            <span className="kuai-orb size-14 shrink-0 rounded-full" aria-hidden="true" />
 
-              <div className="grid size-10 place-items-center rounded-xl bg-brand-500/15 text-brand-300">
-                <Sparkles size={20} />
-              </div>
-
-              <h1 className="font-display text-2xl font-semibold text-white">
+            <div>
+              <h1 className="font-display text-3xl font-extrabold tracking-[-0.03em] text-white">
                 {copy.title}
               </h1>
 
+              <p className="mt-0.5 text-sm text-slate-300">
+                {copy.description}
+              </p>
             </div>
-
-            <p className="mt-2 text-xs text-slate-400 sm:text-sm">
-              {copy.description}
-            </p>
           </div>
 
           <div className="flex flex-wrap items-center gap-3">
@@ -381,7 +437,7 @@ const handleNewConversation = () => {
                 }}
                 aria-label={copy.history}
                 aria-expanded={isHistoryOpen}
-                className="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-4 py-2.5 text-xs font-semibold text-slate-300 transition hover:border-brand-400/30 hover:bg-brand-500/10 hover:text-brand-300"
+                className="kuai-glass inline-flex min-h-11 items-center gap-2 rounded-full border border-white/12 bg-white/5 px-4 text-sm font-medium text-slate-100 transition hover:border-fuchsia-300/40 hover:bg-fuchsia-500/10 disabled:cursor-not-allowed disabled:opacity-40"
               >
                 <History size={15} />
                 {copy.history}
@@ -458,23 +514,11 @@ const handleNewConversation = () => {
                 (messages.length === 0 && conversationId === null)
               }
               aria-label={copy.newChatAria}
-              className="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-4 py-2.5 text-xs font-semibold text-slate-300 transition hover:border-brand-400/30 hover:bg-brand-500/10 hover:text-brand-300 disabled:cursor-not-allowed disabled:opacity-40"
+              className="kuai-glass inline-flex min-h-11 items-center gap-2 rounded-full border border-white/12 bg-white/5 px-4 text-sm font-medium text-slate-100 transition hover:border-fuchsia-300/40 hover:bg-fuchsia-500/10 disabled:cursor-not-allowed disabled:opacity-40"
             >
               <Plus size={15} />
               {copy.newChat}
             </button>
-
-            {/* API Integration Status Label */}
-
-            <div className="flex items-center gap-2 rounded-full border border-brand-400/20 bg-brand-400/5 px-3 py-2">
-
-              <span className="size-2 rounded-full bg-brand-400" />
-
-              <span className="text-[10px] font-semibold tracking-wide text-amber-300">
-                {copy.aiProvider}
-              </span>
-
-            </div>
 
           </div>
 
@@ -483,7 +527,7 @@ const handleNewConversation = () => {
         {error && messages.length === 0 && (
           <div
             role="alert"
-            className="mb-4 rounded-xl border border-red-400/20 bg-red-400/5 p-4 text-xs leading-6 text-red-300"
+            className="mb-4 shrink-0 rounded-xl border border-red-400/20 bg-red-400/5 p-4 text-xs leading-6 text-red-300"
           >
             {error}
           </div>
@@ -493,7 +537,7 @@ const handleNewConversation = () => {
 
         <section
           aria-label={copy.conversationLabel}
-          className="flex min-h-140 flex-1 flex-col overflow-hidden rounded-panel border border-border-subtle bg-surface-900 shadow-glow"
+          className="flex min-h-0 flex-1 flex-col overflow-hidden rounded-panel border border-border-subtle bg-surface-900 shadow-glow"
         >
 
           {/* Message Area */}
@@ -505,57 +549,49 @@ const handleNewConversation = () => {
             aria-relevant="additions"
             aria-atomic="false"
             aria-busy={isLoading}
-            className="min-h-105 flex-1 overflow-y-auto p-4 sm:p-6"
+            className="min-h-0 flex-1 overflow-y-auto overscroll-contain p-4 sm:p-6"
           >
 
             {messages.length === 0 ? (
 
               /* Empty State */
 
-              <div className="flex min-h-97.5 flex-col items-center justify-center py-10 text-center">
-
-                <div className="grid size-16 place-items-center rounded-2xl border border-brand-400/20 bg-brand-500/10 text-brand-300 shadow-glow">
-
-                  <MessageCircle size={28} />
-
-                </div>
-
-                <h2 className="mt-6 font-display text-2xl font-semibold text-white">
-                  {copy.emptyTitle}
-                </h2>
-
-                <p className="mt-3 max-w-md text-sm leading-7 text-slate-400">
-                  {copy.emptyDescription}
-                </p>
-
-                {/* Suggested Questions */}
-
-                <div className="mt-8 w-full max-w-lg">
-
-                  <div className="mb-3 flex items-center justify-center gap-2 text-xs text-slate-400">
-                    <Users size={14} />
-                    {copy.tryAsking}
+              <div className="mx-auto flex w-full max-w-3xl flex-col gap-6">
+                {/* Welcome message from the assistant */}
+                <div className="kuai-message flex max-w-[85%] gap-3">
+                  <div
+                    aria-hidden="true"
+                    className="grid size-9 shrink-0 place-items-center rounded-xl bg-linear-to-br from-fuchsia-500 via-violet-600 to-cyan-400 font-display text-xs font-extrabold text-white"
+                  >
+                    Ai
                   </div>
 
-                  <div className="flex flex-wrap justify-center gap-2">
+                  <div className="rounded-[4px_20px_20px_20px] border border-white/10 bg-white/7 px-4 py-3">
+                    <h2 className="text-[15px] font-normal leading-7 text-slate-100">
+                      {copy.emptyTitle}
+                    </h2>
+                  </div>
+                </div>
 
+                {/* Suggested Questions */}
+                <div>
+                  <p className="mb-3 font-mono text-[11px] tracking-[0.2em] text-accent-magenta">
+                    {copy.tryAsking}
+                  </p>
+
+                  <div className="flex flex-wrap gap-2.5">
                     {copy.suggestedPrompts.map((prompt) => (
-
                       <button
                         key={prompt}
                         type="button"
                         onClick={() => handleSuggestionClick(prompt)}
-                        className="rounded-full border border-white/10 bg-white/4 px-4 py-2.5 text-xs text-slate-300 transition hover:border-brand-400/30 hover:bg-brand-500/10 hover:text-brand-300 focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-brand-300"
+                        className="min-h-11 rounded-full border border-white/12 bg-white/4 px-4 text-sm text-slate-100 transition hover:-translate-y-0.5 hover:border-fuchsia-300/50 hover:bg-fuchsia-500/12 focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-accent-magenta"
                       >
                         {prompt}
                       </button>
-
                     ))}
-
                   </div>
-
                 </div>
-
               </div>
 
             ) : (
@@ -640,7 +676,7 @@ const handleNewConversation = () => {
 
         {/* Footer Disclaimer */}
 
-        <p className="mt-4 text-center text-[10px] leading-5 text-slate-400">
+        <p className="mt-3 shrink-0 text-center text-[10px] leading-5 text-slate-400">
           {copy.disclaimer}
         </p>
 

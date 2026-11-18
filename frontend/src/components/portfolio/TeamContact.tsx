@@ -129,11 +129,11 @@ function TeamContact() {
       />
 
       <div className="mx-auto max-w-7xl">
-        <div className="relative overflow-hidden rounded-panel border border-border-subtle bg-surface-900 p-8 shadow-glow sm:p-12 lg:p-16">
+        <div className="kuai-ring relative overflow-hidden rounded-panel border border-border-subtle bg-surface-900 p-8 shadow-glow sm:p-12 lg:p-16">
           {/* Decorative Glow */}
           <div
             aria-hidden="true"
-            className="pointer-events-none absolute -left-20 -top-20 size-72 rounded-full bg-brand-500/10 blur-[100px]"
+            className="pointer-events-none absolute -left-20 -top-20 size-72 rounded-full bg-fuchsia-500/25 blur-[100px]"
           />
 
           <div className="relative grid items-center gap-12 lg:grid-cols-[1fr_auto]">
@@ -166,7 +166,7 @@ function TeamContact() {
                     target="_blank"
                     rel="noopener noreferrer"
                     aria-label={`Visit ${teamName} on GitHub`}
-                    className="inline-flex items-center gap-2 rounded-full bg-brand-500 px-5 py-3 text-sm font-semibold text-white transition hover:-translate-y-0.5 hover:bg-brand-600 focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-brand-300"
+                    className="inline-flex items-center gap-2 rounded-full kuai-gradient-button px-5 py-3 text-sm font-semibold text-white focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-brand-300"
                   >
                     <Code2 size={17} aria-hidden="true" />
                     GitHub

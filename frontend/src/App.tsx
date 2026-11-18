@@ -9,6 +9,7 @@ import {
 
 import PortfolioPage, { MemberProfilePage } from './pages/PortfolioPage'
 import ChatPage from './pages/ChatPage'
+import GalaxyBackground from './components/layout/GalaxyBackground'
 import { useLanguage } from './contexts/language-context'
 import { PortfolioDataContext } from './data/portfolioData'
 import type { PortfolioData } from './data/portfolioData'
@@ -53,7 +54,7 @@ function PortfolioLoader({ children }: { children: React.ReactNode }) {
   }
 
   return (
-    <main className="min-h-screen bg-ink-950 px-5 py-20 text-center text-white">
+    <main className="min-h-screen bg-transparent px-5 py-20 text-center text-white">
       {failed ? (
         <div role="alert">
           <p>{language === 'th' ? 'ไม่สามารถโหลดข้อมูล Portfolio ได้' : 'Unable to load portfolio data.'}</p>
@@ -73,6 +74,7 @@ function App() {
 
   return (
     <>
+    <GalaxyBackground spiralPosition={isChatRoute ? 'bottom-left' : 'top-right'} />
     <Routes>
 
       {/* Main Portfolio Page */}

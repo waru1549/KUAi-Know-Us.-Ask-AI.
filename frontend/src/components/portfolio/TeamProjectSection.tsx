@@ -145,7 +145,7 @@ function ProjectCard({
   return (
     <article
       aria-labelledby={`team-project-${project.id}`}
-      className="overflow-hidden rounded-2xl border border-border-subtle bg-surface-900 transition duration-300 hover:-translate-y-1 hover:shadow-glow"
+      className="kuai-ring kuai-lift group overflow-hidden rounded-2xl border border-border-subtle bg-surface-900"
     >
       {/* Project Cover */}
       <div className="relative">
@@ -269,7 +269,7 @@ function ProjectCard({
                 target="_blank"
                 rel="noopener noreferrer"
                 aria-label={`${copy.sourceCode}: ${title}`}
-                className="inline-flex items-center gap-2 rounded-full bg-brand-500 px-4 py-2.5 text-xs font-semibold text-white transition hover:bg-brand-600 focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-brand-300"
+                className="inline-flex items-center gap-2 rounded-full kuai-gradient-button px-4 py-2.5 text-xs font-semibold text-white focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-brand-300"
               >
                 <FaGithub size={15} aria-hidden="true" />
                 {copy.sourceCode}
