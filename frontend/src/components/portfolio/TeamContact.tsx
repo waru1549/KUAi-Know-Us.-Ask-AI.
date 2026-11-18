@@ -96,8 +96,7 @@ function TeamContact() {
   const copy = getContactCopy(language)
 
   // Protect unverified team/contact information.
-  const contactIsVerified =
-    !group.isPlaceholder && !group.contact.isPlaceholder
+  const contactIsVerified = !group.contact.isPlaceholder
 
   const githubUrl = contactIsVerified
     ? getSafeExternalUrl(group.contact.githubUrl)
@@ -109,12 +108,12 @@ function TeamContact() {
 
   const hasContactInformation = Boolean(githubUrl || teamEmail)
 
-  const teamName = group.isPlaceholder
-    ? isThai
-      ? 'ทีมของเรา'
-      : 'our team'
-    : getLocalizedText(group.teamNameI18n, language) ||
-      group.teamName
+  const teamName = getLocalizedText(group.teamNameI18n, language) ||
+    (group.isPlaceholder
+      ? isThai
+        ? 'ทีมของเรา'
+        : 'our team'
+      : group.teamName)
 
   return (
     <section

@@ -326,6 +326,28 @@ describe('ChatPage Component', () => {
 
   })
 
+  it('should restore saved conversations after remounting', async () => {
+    const user = userEvent.setup()
+    mockSendChatMessage.mockResolvedValueOnce({
+      reply: 'Our team consists of three members.',
+      conversationId: 'conversation-persisted',
+    })
+
+    const view = renderChatPage()
+    await sendMessage(user, 'Who are the team members?')
+    await screen.findByText('Our team consists of three members.')
+
+    expect(
+      window.localStorage.getItem('team-portfolio-ai-chat-history-v1'),
+    ).toContain('conversation-persisted')
+
+    view.unmount()
+    renderChatPage()
+    await user.click(screen.getByRole('button', { name: 'History' }))
+
+    expect(screen.getByText('Who are the team members?')).toBeInTheDocument()
+  })
+
   // TEST 4: LOADING STATE
 
   it('should display the loading indicator while waiting for the API', async () => {

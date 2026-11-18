@@ -121,6 +121,38 @@ interface SavedConversation {
   readonly updatedAt: string
 }
 
+const CHAT_HISTORY_STORAGE_KEY = 'team-portfolio-ai-chat-history-v1'
+
+function isSavedConversation(value: unknown): value is SavedConversation {
+  if (typeof value !== 'object' || value === null || Array.isArray(value)) {
+    return false
+  }
+
+  const record = value as Record<string, unknown>
+  return (
+    typeof record.conversationId === 'string' &&
+    Boolean(record.conversationId.trim()) &&
+    typeof record.title === 'string' &&
+    typeof record.updatedAt === 'string' &&
+    Number.isFinite(Date.parse(record.updatedAt))
+  )
+}
+
+function readSavedConversations(): SavedConversation[] {
+  try {
+    const stored = window.localStorage.getItem(CHAT_HISTORY_STORAGE_KEY)
+    if (!stored) return []
+
+    const parsed: unknown = JSON.parse(stored)
+    return Array.isArray(parsed)
+      ? parsed.filter(isSavedConversation)
+      : []
+  } catch (error) {
+    console.error('Unable to restore saved chat history.', error)
+    return []
+  }
+}
+
 function ChatPage() {
   const { language } = useLanguage()
   const copy = chatPageCopy[language]
@@ -137,7 +169,7 @@ function ChatPage() {
   // Conversation State
   const [conversationId, setConversationId] = useState<string | null>(null)
   const [savedConversations, setSavedConversations] =
-    useState<SavedConversation[]>([])
+    useState<SavedConversation[]>(readSavedConversations)
   const [isHistoryOpen, setIsHistoryOpen] = useState(false)
   const [openMenuId, setOpenMenuId] = useState<string | null>(null)
 
@@ -157,6 +189,17 @@ function ChatPage() {
       block: 'end',
     })
   }, [messages, isLoading, error])
+
+  useEffect(() => {
+    try {
+      window.localStorage.setItem(
+        CHAT_HISTORY_STORAGE_KEY,
+        JSON.stringify(savedConversations),
+      )
+    } catch (error) {
+      console.error('Unable to persist saved chat history.', error)
+    }
+  }, [savedConversations])
 
   // Send message to Express Backend
   const sendToBackend = async (content: string) => {
