@@ -347,7 +347,7 @@ export const portfolioData: PortfolioData = {
         en: 'Placeholder: Add the member biography and interests.',
         th: 'ข้อความตัวอย่าง: เพิ่มประวัติและความสนใจของสมาชิก',
       },
-      avatar: undefined,
+      avatar: '/images/projects/member-1/member-1.jpg',
       mainContribution: {
         en: 'Portfolio UI, chat UI and state management',
         th: 'Portfolio UI, Chat UI และ State Management',
