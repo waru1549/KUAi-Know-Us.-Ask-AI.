@@ -1,4 +1,5 @@
 import {
+  Fragment,
   useEffect,
   useRef,
   useState,
@@ -139,8 +140,12 @@ function TeamHero() {
               const isLast = index === taglineWords.length - 1
               const isSecondLine = index >= Math.ceil(taglineWords.length / 2)
 
+              const startsSecondLine = index === Math.ceil(taglineWords.length / 2)
+
               return (
-                <span key={`${index}-${word}`} className="kuai-word">
+                <Fragment key={`${index}-${word}`}>
+                {startsSecondLine && <br />}
+                <span className="kuai-word">
                   <span
                     className={isLast ? 'kuai-shine' : isSecondLine ? 'kuai-glow-text' : undefined}
                     style={{ animationDelay: `${0.05 + index * 0.1}s` }}
@@ -149,6 +154,7 @@ function TeamHero() {
                     {!isLast && ' '}
                   </span>
                 </span>
+                </Fragment>
               )
             })}
           </h1>

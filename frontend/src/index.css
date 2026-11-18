@@ -267,6 +267,8 @@ textarea {
 /* Words rise into view one at a time */
 .kuai-word { display: inline-block; overflow: hidden; vertical-align: bottom; padding-bottom: .06em; }
 .kuai-word > span { display: inline-block; animation: kuai-rise .9s cubic-bezier(.2,.8,.2,1) both; }
+/* The word mask would clip a text glow into a visible box, so headline words get no glow */
+.kuai-word .kuai-glow-text { text-shadow: none; }
 
 .kuai-fade { animation: kuai-fade 1s ease both; }
 
