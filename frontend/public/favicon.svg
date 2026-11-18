@@ -1,25 +1,62 @@
-
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 150 150" fill="none">
+  <title>KUAi</title>
   <defs>
-    <linearGradient id="purple" x1="0" y1="0" x2="1" y2="1">
-      <stop offset="0%" stop-color="#C084FC"/>
-      <stop offset="55%" stop-color="#A855F7"/>
-      <stop offset="100%" stop-color="#7E22CE"/>
-    </linearGradient>
+    <radialGradient id="tile" cx="0.3" cy="0.2" r="1">
+      <stop stop-color="#2A0F52"/><stop offset="0.6" stop-color="#0B0720"/><stop offset="1" stop-color="#03020A"/>
+    </radialGradient>
   </defs>
+  <rect width="150" height="150" rx="34" fill="url(#tile)"/>
+  <defs>
+    <linearGradient id="k" x1="30" y1="26" x2="118" y2="124" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#E9D5FF"/><stop offset="0.28" stop-color="#C084FC"/><stop offset="0.62" stop-color="#6366F1"/><stop offset="1" stop-color="#38BDF8"/>
+    </linearGradient>
+    <linearGradient id="gloss" x1="35" y1="30" x2="80" y2="95" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#FFFFFF" stop-opacity="0.55"/><stop offset="0.45" stop-color="#FFFFFF" stop-opacity="0.08"/><stop offset="1" stop-color="#FFFFFF" stop-opacity="0"/>
+    </linearGradient>
+    <linearGradient id="orbit" x1="8" y1="75" x2="142" y2="75" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#F0ABFC" stop-opacity="0.9"/><stop offset="0.4" stop-color="#A78BFA"/><stop offset="0.75" stop-color="#38BDF8"/><stop offset="1" stop-color="#67E8F9" stop-opacity="0.7"/>
+    </linearGradient>
+    <radialGradient id="planet" cx="0.35" cy="0.35" r="0.75">
+      <stop stop-color="#FFFFFF"/><stop offset="0.45" stop-color="#A5F3FC"/><stop offset="1" stop-color="#0EA5E9"/>
+    </radialGradient>
+    <linearGradient id="word" x1="0" y1="40" x2="0" y2="88" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#FFFFFF"/><stop offset="1" stop-color="#DDD6FE"/>
+    </linearGradient>
+    <linearGradient id="ai" x1="395" y1="30" x2="485" y2="95" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#F0ABFC"/><stop offset="0.5" stop-color="#A78BFA"/><stop offset="1" stop-color="#38BDF8"/>
+    </linearGradient>
+    <filter id="glow" x="-40%" y="-40%" width="180%" height="180%">
+      <feGaussianBlur stdDeviation="7" result="blur"/>
+      <feColorMatrix in="blur" values="0 0 0 0 0.66  0 0 0 0 0.45  0 0 0 0 1  0 0 0 0.55 0"/>
+    </filter>
+    <filter id="spark" x="-100%" y="-100%" width="300%" height="300%">
+      <feGaussianBlur stdDeviation="2.2" result="blur"/>
+      <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
+    </filter>
+    <clipPath id="front"><rect x="0" y="75" width="150" height="40"/></clipPath>
+    <path id="kShape" d="M36 30 H55 V65.5 L87.5 30 H112 L68.5 74 L116 120 H90.5 L55 84.5 V120 H36 Z"/>
+  </defs>
+  <!-- Orbit, back half -->
+  <g transform="rotate(-28 75 75)">
+    <ellipse cx="75" cy="75" rx="68" ry="25" stroke="url(#orbit)" stroke-width="1.4" opacity="0.35"/>
+  </g>
 
-  <rect width="64" height="64" rx="17" fill="url(#purple)"/>
+  <!-- K: glow, gradient, gloss, rim -->
+  <use href="#kShape" fill="#A855F7" filter="url(#glow)"/>
+  <use href="#kShape" fill="url(#k)"/>
+  <use href="#kShape" fill="url(#gloss)"/>
+  <use href="#kShape" stroke="#FFFFFF" stroke-opacity="0.18" stroke-width="1"/>
 
-  <text
-    x="32"
-    y="39"
-    text-anchor="middle"
-    font-family="Arial, Helvetica, sans-serif"
-    font-size="22"
-    font-weight="800"
-    letter-spacing="-1.5"
-    fill="#FFFFFF"
-  >KUA<tspan fill="#67E8F9">i</tspan></text>
+  <!-- Orbit, front half + planet -->
+  <g transform="rotate(-28 75 75)">
+    <ellipse cx="75" cy="75" rx="68" ry="25" stroke="url(#orbit)" stroke-width="2.6" stroke-linecap="round" clip-path="url(#front)"/>
+    <circle cx="127" cy="91" r="4.6" fill="url(#planet)" filter="url(#spark)"/>
+  </g>
 
-  <circle cx="52" cy="12" r="2" fill="#FFFFFF" opacity=".85"/>
+  <!-- Sparkles -->
+  <g class="sparkle" filter="url(#spark)">
+    <path d="M118 15 Q119.6 28.4 133 30 Q119.6 31.6 118 45 Q116.4 31.6 103 30 Q116.4 28.4 118 15 Z" fill="#F5D0FE"/>
+  </g>
+  <path d="M138 46 Q138.6 50.4 143 51 Q138.6 51.6 138 56 Q137.4 51.6 133 51 Q137.4 50.4 138 46 Z" fill="#A5F3FC" opacity="0.85"/>
+
 </svg>

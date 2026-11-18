@@ -88,6 +88,8 @@ export interface ProjectBase {
   readonly demoUrl?: string;
   /** True means this is demonstration content, not a verified portfolio claim. */
   readonly isPlaceholder: boolean;
+  /** Show this project in the "Selected work" section of the home page. */
+  readonly isHighlighted?: boolean;
 }
 
 /** A project owned by an individual member. The array is intentionally unlimited. */
@@ -128,6 +130,10 @@ export interface DevOpsSkills {
 
 interface MemberBase {
   readonly id: MemberId;
+  /** One line on what this member built for the team project (shown on the member card). */
+  readonly mainContribution?: LocalizedText;
+  /** Up to five skills shown as chips on the member card. */
+  readonly highlightSkills?: readonly string[];
   readonly fullName: string;
   readonly nickname: string;
   readonly fullNameI18n?: LocalizedText;
@@ -261,7 +267,7 @@ export const portfolioData: PortfolioData = {
     jointProject: {
       title: 'Chat AI with Group Portfolio',
       description:
-        'A group portfolio website with an interactive AI chat interface. The React frontend is implemented; the Express backend, PostgreSQL persistence, and live AI integration are still in development.',
+        'A team portfolio website where visitors ask an AI about our members, skills and projects in real time. React frontend, Express API, PostgreSQL chat history and Google Gemini, in Thai and English.',
       isPlaceholder: false,
     },
     contact: {
@@ -342,6 +348,11 @@ export const portfolioData: PortfolioData = {
         th: 'ข้อความตัวอย่าง: เพิ่มประวัติและความสนใจของสมาชิก',
       },
       avatar: undefined,
+      mainContribution: {
+        en: 'Portfolio UI, chat UI and state management',
+        th: 'Portfolio UI, Chat UI และ State Management',
+      },
+      highlightSkills: ['React', 'TypeScript', 'Tailwind CSS', 'Figma', 'Framer Motion'],
       socialLinks: { 
         github: '', 
         linkedin: 'https://www.linkedin.com/in/warunee-kludpan-2a27663b0?utm_source=share_via&utm_content=profile&utm_medium=member_ios', 
@@ -397,6 +408,7 @@ export const portfolioData: PortfolioData = {
           technologies: ['UX/UI Design', 'Computer Vision'],
           coverImage: undefined,
           isPlaceholder: false,
+          isHighlighted: true,
         },
         {
           id: 'member-1-project-2',
@@ -451,6 +463,11 @@ export const portfolioData: PortfolioData = {
         th: 'ข้อความตัวอย่าง: เพิ่มประวัติและความสนใจของสมาชิก',
       },
       avatar: '/images/projects/member-2/member-2.jpeg',
+      mainContribution: {
+        en: 'Express API, PostgreSQL and AI context injection',
+        th: 'Express API, PostgreSQL และ AI Context Injection',
+      },
+      highlightSkills: ['Node.js', 'Express', 'PostgreSQL', 'Prompt Engineering', 'Prisma ORM'],
       socialLinks: {
         github: 'https://github.com/phumthanakrit',
         linkedin: 'https://www.linkedin.com/in/thanakrit-archawabool-80aa563b0/',
@@ -525,6 +542,8 @@ export const portfolioData: PortfolioData = {
             'Nginx',
             'GitHub Actions',
           ],
+          projectType: { en: 'Web', th: 'เว็บ' },
+          isHighlighted: true,
           coverImage: '/images/projects/member-2/member-2-project-1.png',
           isPlaceholder: false,
         },
@@ -581,6 +600,11 @@ export const portfolioData: PortfolioData = {
         th: 'ข้อความตัวอย่าง: เพิ่มประวัติและความสนใจของสมาชิก',
       },
       avatar: '/images/projects/member-3/member-3.jpg',
+      mainContribution: {
+        en: 'Docker, CI/CD and automated testing',
+        th: 'Docker, CI/CD และ Automated Testing',
+      },
+      highlightSkills: ['Docker', 'GitHub Actions', 'Jest', 'Nginx', 'Linux Server'],
       socialLinks: { 
         github: 'https://github.com/view-ttyp', 
         linkedin: '', 
@@ -667,8 +691,8 @@ export const portfolioData: PortfolioData = {
         th: 'แชต AI พร้อม Portfolio ของกลุ่ม',
       },
       description: {
-        en: 'A group portfolio website with an interactive AI chat interface. The React frontend is implemented; the Express backend, PostgreSQL persistence, and live AI integration are still in development.',
-        th: 'เว็บไซต์ Portfolio ของกลุ่มที่มาพร้อมส่วนติดต่อสำหรับสนทนากับ AI โดยพัฒนา Frontend ด้วย React แล้ว ส่วน Express Backend การจัดเก็บประวัติด้วย PostgreSQL และการเชื่อมต่อ AI จริงยังอยู่ระหว่างพัฒนา',
+        en: 'A team portfolio website where visitors ask an AI about our members, skills and projects in real time. React frontend, Express API, PostgreSQL chat history and Google Gemini, in Thai and English.',
+        th: 'เว็บ Portfolio ของทีมที่ให้ผู้เข้าชมถาม AI เกี่ยวกับสมาชิก ทักษะ และผลงานได้แบบเรียลไทม์ ใช้ React, Express API, PostgreSQL เก็บประวัติแชต และ Google Gemini รองรับไทย/อังกฤษ',
       },
       projectType: {
         en: 'Web Application',
@@ -678,9 +702,11 @@ export const portfolioData: PortfolioData = {
       technologies: [
         'React',
         'TypeScript',
-        'Vite',
+        'Express',
+        'PostgreSQL',
+        'Gemini API',
         'Tailwind CSS',
-        'React Router',
+        'Vite',
         'Vitest',
       ],
       features: [

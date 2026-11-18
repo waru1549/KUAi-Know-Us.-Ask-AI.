@@ -7,8 +7,8 @@ import {
   type PointerEvent,
 } from 'react'
 
-import { ArrowDown, ArrowUpRight, Sparkles } from 'lucide-react'
-import { Link, useNavigate } from 'react-router'
+import { ArrowUpRight, Sparkles } from 'lucide-react'
+import { useNavigate } from 'react-router'
 
 import { useLanguage } from '../../contexts/language-context'
 import {
@@ -33,7 +33,6 @@ function TeamHero() {
           askLabel: 'ถามคำถามเกี่ยวกับทีม',
           ask: 'ถาม AI',
           askHint: 'ตอบได้ทั้งภาษาไทยและอังกฤษ · ขับเคลื่อนด้วย Google Gemini',
-          meetTeam: 'รู้จักทีมของเรา',
           sample: 'ตัวอย่างบทสนทนา',
           sampleQuestion: 'ใครดูแลฐานข้อมูลของทีม?',
           questions: [
@@ -47,7 +46,6 @@ function TeamHero() {
           askLabel: 'Ask a question about the team',
           ask: 'Ask AI',
           askHint: 'Answers in Thai or English · Powered by Google Gemini',
-          meetTeam: 'Meet the team',
           sample: 'Sample conversation',
           sampleQuestion: 'Who looks after the team database?',
           questions: [
@@ -68,7 +66,8 @@ function TeamHero() {
   }, [])
 
   const appFullName = group.appFullName || group.teamName
-  const tagline = getLocalizedText(group.taglineI18n, language) || group.tagline
+  // The headline is the English brand slogan in both languages (Thai has no spaces to split into words).
+  const tagline = group.taglineI18n.en.trim() || group.tagline
   const introduction = getLocalizedText(group.introduction, language)
 
   // Split the tagline so each word can rise in on its own.
@@ -76,9 +75,25 @@ function TeamHero() {
 
   // Build the sample answer from real data: the backend member's name and role.
   const backendMember = members.find((member) => member.roleKey === 'backend')
-  const sampleAnswer = backendMember
-    ? `${getLocalizedText(backendMember.nicknameI18n ?? { en: backendMember.nickname, th: backendMember.nickname }, language)} — ${getLocalizedText(backendMember.roleNameI18n, language) || backendMember.roleName}`
-    : ''
+  const sampleAnswer = (() => {
+    if (!backendMember) return ''
+
+    const nickname = backendMember.nicknameI18n
+      ? getLocalizedText(backendMember.nicknameI18n, language)
+      : backendMember.nickname
+    const firstName = (backendMember.fullNameI18n
+      ? getLocalizedText(backendMember.fullNameI18n, language)
+      : backendMember.fullName
+    ).split(/\s+/)[0]
+    const role = backendMember.roleNameI18n.en || backendMember.roleName
+    const contribution = backendMember.mainContribution
+      ? getLocalizedText(backendMember.mainContribution, language)
+      : ''
+
+    return language === 'th'
+      ? `${nickname} (${firstName}) เป็น ${role}${contribution ? ` ดูแล ${contribution}` : ''}`
+      : `${nickname} (${firstName}) is our ${role}${contribution ? `, working on ${contribution}` : ''}.`
+  })()
 
   const handlePointerMove = (event: PointerEvent<HTMLElement>) => {
     const rect = event.currentTarget.getBoundingClientRect()
@@ -185,14 +200,6 @@ function TeamHero() {
             <p className="mt-3 pl-5 text-xs text-slate-400">{copy.askHint}</p>
           </form>
 
-          <a
-            href="#members"
-            className="kuai-fade mt-8 inline-flex min-h-11 items-center gap-2 text-sm font-medium text-slate-300 transition hover:text-white"
-            style={{ animationDelay: '1s' }}
-          >
-            {copy.meetTeam}
-            <ArrowDown size={16} aria-hidden="true" />
-          </a>
         </div>
 
         {/* Floating sample conversation */}
@@ -204,7 +211,7 @@ function TeamHero() {
           >
             <div className="kuai-float kuai-glass rounded-[1.75rem] border border-white/12 bg-white/6 p-6 shadow-2xl">
               <div className="flex items-center gap-3 border-b border-white/10 pb-4">
-                <span className="kuai-orb size-9 rounded-xl" aria-hidden="true" />
+                <span className="grid size-9 place-items-center rounded-xl bg-linear-to-br from-fuchsia-500 via-violet-600 to-cyan-400 font-display text-xs font-extrabold text-white" aria-hidden="true">Ai</span>
                 <div>
                   <p className="text-sm font-semibold text-white">KUAi Assistant</p>
                   <p className="text-xs text-accent-cyan">{copy.sample}</p>
@@ -221,13 +228,6 @@ function TeamHero() {
                 </p>
               </div>
 
-              <Link
-                to="/chat"
-                className="mt-5 inline-flex min-h-11 items-center gap-2 text-sm font-semibold text-accent-magenta hover:text-white"
-              >
-                KUAi Assistant
-                <ArrowUpRight size={15} aria-hidden="true" />
-              </Link>
             </div>
           </aside>
         )}

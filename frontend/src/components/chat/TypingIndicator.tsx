@@ -1,6 +1,4 @@
 
-import { Sparkles } from 'lucide-react'
-
 import { useLanguage } from '../../contexts/language-context'
 
 import type { Language } from '../../data/portfolioData'
@@ -26,24 +24,20 @@ function TypingIndicator() {
     <div
       role="status"
       aria-live="polite"
-      className="flex items-center gap-3"
+      className="kuai-message flex items-center gap-3"
     >
-      <div className="grid size-9 shrink-0 place-items-center rounded-xl bg-brand-500/15 text-brand-300 ring-1 ring-brand-400/20">
-        <Sparkles size={17} />
+      <div
+        className="grid size-9 shrink-0 place-items-center rounded-xl bg-linear-to-br from-fuchsia-500 via-violet-600 to-cyan-400 font-display text-xs font-extrabold text-white"
+        aria-hidden="true"
+      >
+        Ai
       </div>
 
-      <div className="flex items-center gap-3 rounded-2xl rounded-tl-sm border border-white/10 bg-surface-800 px-4 py-3">
-        <span className="text-xs text-slate-400">
-          {copy.label}
-        </span>
-
-        <div className="flex items-center gap-1">
-          <span className="size-1.5 animate-bounce rounded-full bg-brand-300" />
-
-          <span className="size-1.5 animate-bounce rounded-full bg-brand-300 [animation-delay:150ms]" />
-
-          <span className="size-1.5 animate-bounce rounded-full bg-brand-300 [animation-delay:300ms]" />
-        </div>
+      <div className="flex items-center gap-1.5 rounded-[4px_20px_20px_20px] border border-white/10 bg-white/7 px-4 py-4">
+        <span className="sr-only">{copy.label}</span>
+        <span className="kuai-typing-dot" aria-hidden="true" />
+        <span className="kuai-typing-dot" aria-hidden="true" />
+        <span className="kuai-typing-dot" aria-hidden="true" />
       </div>
     </div>
   )
