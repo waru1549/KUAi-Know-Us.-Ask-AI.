@@ -189,7 +189,7 @@ if (!Number.isInteger(port) || port < 1 || port > 65_535) {
   throw new Error('PORT must be an integer between 1 and 65535.')
 }
 
-const model = process.env.GEMINI_MODEL?.trim() || 'gemini-2.5-flash'
+const model = process.env.GEMINI_MODEL?.trim() || 'gemini-3.5-flash-lite'
 const allowedOrigins = (process.env.CORS_ORIGINS ?? '')
   .split(',')
   .map((origin) => origin.trim())
