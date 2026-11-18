@@ -406,7 +406,7 @@ export const portfolioData: PortfolioData = {
             th: 'พัฒนาระบบจองแบบเรียลไทม์บนเว็บสำหรับห้องปฏิบัติการ AIE ผสานการตรวจจับวัตถุจากกล้องเพื่อติดตามการใช้ที่นั่งและสถานะการจองแบบเรียลไทม์ พร้อมออกแบบ UX/UI เพื่อให้จองออนไลน์ได้อย่างราบรื่น',
           },
           technologies: ['UX/UI Design', 'Computer Vision'],
-          coverImage: undefined,
+          coverImage: '/images/projects/member-1/smart-lab-booking.png',
           isPlaceholder: false,
           isHighlighted: true,
         },
