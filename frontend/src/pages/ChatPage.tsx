@@ -1,4 +1,3 @@
-
 import {
   useEffect,
   useRef,
@@ -444,13 +443,13 @@ const handleNewConversation = () => {
               </button>
 
               {isHistoryOpen && (
-                <div className="absolute right-0 top-full z-30 mt-2 w-[min(22rem,calc(100vw-2rem))] overflow-hidden rounded-xl border border-border-subtle bg-surface-900 shadow-glow">
-                  <p className="border-b border-white/10 px-4 py-3 text-xs font-semibold text-white">
+                <div className="absolute right-0 top-full z-50 mt-2 w-[min(24rem,calc(100vw-2rem))] overflow-hidden rounded-2xl border border-white/15 bg-[#140b2e] shadow-[0_24px_60px_-12px_rgb(0_0_0/0.85)]">
+                  <p className="border-b border-white/10 px-4 py-3 font-mono text-[11px] tracking-[0.2em] text-accent-magenta uppercase">
                     {copy.history}
                   </p>
 
                   {savedConversations.length === 0 ? (
-                    <p className="px-4 py-5 text-xs text-slate-400">
+                    <p className="px-4 py-5 text-sm text-slate-300">
                       {copy.emptyHistory}
                     </p>
                   ) : (
@@ -458,13 +457,13 @@ const handleNewConversation = () => {
                       {savedConversations.map((savedConversation) => (
                         <li
                           key={savedConversation.conversationId}
-                          className="flex items-center gap-1 rounded-lg hover:bg-white/5"
+                          className="flex items-center gap-1 rounded-xl transition hover:bg-white/10"
                         >
                           <button
                             type="button"
                             onClick={() => void handleOpenConversation(savedConversation)}
                             disabled={isLoading}
-                            className="min-w-0 flex-1 truncate px-3 py-2.5 text-left text-xs text-slate-200 disabled:opacity-50"
+                            className="min-w-0 flex-1 truncate px-3 py-3 text-left text-sm text-slate-100 disabled:opacity-50"
                           >
                             {savedConversation.title}
                           </button>
@@ -489,7 +488,7 @@ const handleNewConversation = () => {
                                 type="button"
                                 onClick={() => void handleDeleteConversation(savedConversation)}
                                 aria-label={`${copy.deleteChat}: ${savedConversation.title}`}
-                                className="absolute right-0 top-full z-40 inline-flex w-44 items-center gap-2 rounded-lg border border-border-subtle bg-surface-900 px-3 py-2.5 text-left text-xs text-red-300 shadow-glow hover:bg-red-400/10"
+                                className="absolute right-0 top-full z-50 inline-flex w-48 items-center gap-2 rounded-xl border border-white/15 bg-[#1d0f3d] px-3 py-2.5 text-left text-sm text-red-300 shadow-[0_16px_40px_-10px_rgb(0_0_0/0.8)] hover:bg-[#2a1450]"
                               >
                                 <Trash2 size={14} />
                                 {copy.deleteChat}
