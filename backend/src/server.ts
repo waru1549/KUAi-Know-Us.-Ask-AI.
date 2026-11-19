@@ -5,6 +5,7 @@ import { setTimeout as delay } from 'node:timers/promises'
 import cors from 'cors'
 import express, { type ErrorRequestHandler } from 'express'
 import { initializeDatabase, pool } from './database.ts'
+import { createRateLimiter, isUuid } from './guards.ts'
 import { buildPortfolioContext, portfolioData } from './portfolioData.ts'
 
 function isRecord(value: unknown): value is Record<string, unknown> {
@@ -22,10 +23,6 @@ function sendError(
   })
 }
 
-function isUuid(value: string): boolean {
-  return /^[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(value)
-}
-
 interface StoredChatMessage {
   readonly id: string
   readonly role: 'user' | 'assistant'
@@ -37,33 +34,8 @@ const activeConversations = new Set<string>()
 const MAX_CONTEXT_MESSAGES = 40
 const CONVERSATION_RETENTION_DAYS = 30
 const MAX_CHAT_REQUESTS_PER_MINUTE = 10
-const chatRequestsByClient = new Map<string, number[]>()
-
-/** Per-client sliding window, so one visitor cannot use up everyone's quota. */
-function isRateLimited(clientKey: string, now: number): boolean {
-  const recent = (chatRequestsByClient.get(clientKey) ?? []).filter(
-    (timestamp) => now - timestamp < 60_000,
-  )
-
-  if (recent.length >= MAX_CHAT_REQUESTS_PER_MINUTE) {
-    chatRequestsByClient.set(clientKey, recent)
-    return true
-  }
-
-  recent.push(now)
-  chatRequestsByClient.set(clientKey, recent)
-
-  // Keep the map small: forget clients with no recent requests.
-  if (chatRequestsByClient.size > 5_000) {
-    for (const [key, timestamps] of chatRequestsByClient) {
-      if (timestamps.every((timestamp) => now - timestamp >= 60_000)) {
-        chatRequestsByClient.delete(key)
-      }
-    }
-  }
-
-  return false
-}
+// Per-IP sliding window, so one visitor cannot use up everyone's quota.
+const chatRateLimiter = createRateLimiter(MAX_CHAT_REQUESTS_PER_MINUTE, 60_000)
 
 // A type alias (not an interface) so it satisfies pg's QueryResultRow constraint.
 type MessageRow = {
@@ -291,7 +263,7 @@ app.post('/api/chat', async (request, response, next) => {
       ? body.conversationId.trim()
       : randomUUID()
   const message = body.message.trim()
-  if (isRateLimited(request.ip ?? 'unknown', Date.now())) {
+  if (chatRateLimiter.isLimited(request.ip ?? 'unknown', Date.now())) {
     response.setHeader('Retry-After', '60')
     sendError(response, 429, 'RATE_LIMITED', 'Too many questions. Please try again in a minute.')
     return
