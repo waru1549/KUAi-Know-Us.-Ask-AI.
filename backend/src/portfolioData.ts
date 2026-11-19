@@ -340,12 +340,12 @@ export const portfolioData: PortfolioData = {
         th: 'นักพัฒนา Frontend และนักออกแบบ UI/UX',
       },
       introduction: {
-        en: 'Placeholder: Add a member-approved short introduction.',
-        th: 'ข้อความตัวอย่าง: เพิ่มคำแนะนำตัวสั้น ๆ ที่สมาชิกยืนยันแล้ว',
+        en: 'An engineering student majoring in Artificial Intelligence and Data Science, Faculty of Engineering.',
+        th: 'นักศึกษาคณะวิศวกรรมศาสตร์ สาขาวิชาปัญญาประดิษฐ์และวิทยาการข้อมูล',
       },
       biography: {
-        en: 'Placeholder: Add the member biography and interests.',
-        th: 'ข้อความตัวอย่าง: เพิ่มประวัติและความสนใจของสมาชิก',
+        en: 'Especially interested in platform development and robotics.',
+        th: 'มีความสนใจเป็นพิเศษในด้านการพัฒนาแพลตฟอร์มและวิทยาการหุ่นยนต์ (Robotics)',
       },
       avatar: '/images/projects/member-1/member-1.jpg',
       mainContribution: {
@@ -455,8 +455,8 @@ export const portfolioData: PortfolioData = {
         th: 'นักพัฒนา Backend และวิศวกรฐานข้อมูล',
       },
       introduction: {
-        en: 'Placeholder: Add a member-approved short introduction.',
-        th: 'ข้อความตัวอย่าง: เพิ่มคำแนะนำตัวสั้น ๆ ที่สมาชิกยืนยันแล้ว',
+        en: 'An engineering student majoring in Artificial Intelligence and Data Science, Faculty of Engineering.',
+        th: 'นักศึกษาคณะวิศวกรรมศาสตร์ สาขาวิชาปัญญาประดิษฐ์และวิทยาการข้อมูล',
       },
       biography: {
         en: 'Placeholder: Add the member biography and interests.',
@@ -592,8 +592,8 @@ export const portfolioData: PortfolioData = {
         th: 'วิศวกร DevOps และการทดสอบระบบ Full-Stack',
       },
       introduction: {
-        en: 'Placeholder: Add a member-approved short introduction.',
-        th: 'ข้อความตัวอย่าง: เพิ่มคำแนะนำตัวสั้น ๆ ที่สมาชิกยืนยันแล้ว',
+        en: 'An engineering student majoring in Artificial Intelligence and Data Science, Faculty of Engineering.',
+        th: 'นักศึกษาคณะวิศวกรรมศาสตร์ สาขาวิชาปัญญาประดิษฐ์และวิทยาการข้อมูล',
       },
       biography: {
         en: 'Placeholder: Add the member biography and interests.',
