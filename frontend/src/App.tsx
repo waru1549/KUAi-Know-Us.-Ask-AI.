@@ -10,6 +10,8 @@ import {
 import PortfolioPage, { MemberProfilePage } from './pages/PortfolioPage'
 import ChatPage from './pages/ChatPage'
 import GalaxyBackground from './components/layout/GalaxyBackground'
+import IntroScreen from './components/layout/IntroScreen'
+import { shouldShowIntro } from './components/layout/introStorage'
 import { useLanguage } from './contexts/language-context'
 import { PortfolioDataContext } from './data/portfolioData'
 import type { PortfolioData } from './data/portfolioData'
@@ -71,10 +73,15 @@ function PortfolioLoader({ children }: { children: React.ReactNode }) {
 
 function App() {
   const isChatRoute = useMatch('/chat') !== null
+  const isHomeRoute = useMatch('/') !== null
+
+  // The animated intro plays once per tab session, only when the visitor lands on the home page.
+  const [showIntro, setShowIntro] = useState(() => isHomeRoute && shouldShowIntro())
 
   return (
     <>
     <GalaxyBackground spiralPosition={isChatRoute ? 'bottom-left' : 'top-right'} />
+    {showIntro && <IntroScreen onFinish={() => setShowIntro(false)} />}
     <Routes>
 
       {/* Main Portfolio Page */}
