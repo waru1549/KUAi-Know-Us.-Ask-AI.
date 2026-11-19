@@ -42,6 +42,7 @@ interface ChatPageCopy {
   emptyHistory: string
   moreActions: string
   deleteChat: string
+  deleteShort: string
   conversationLabel: string
   messagesLabel: string
   emptyTitle: string
@@ -65,6 +66,7 @@ const chatPageCopy: Record<Language, ChatPageCopy> = {
     emptyHistory: 'No saved conversations in this browser.',
     moreActions: 'More actions',
     deleteChat: 'Delete conversation',
+    deleteShort: 'Delete',
     conversationLabel: 'Chat conversation',
     messagesLabel: 'Chat conversation messages',
     emptyTitle: 'Hi! I am the KUAi team AI assistant. Ask me anything about Ice, Phum or View.',
@@ -93,6 +95,7 @@ const chatPageCopy: Record<Language, ChatPageCopy> = {
     emptyHistory: 'ยังไม่มีประวัติแชตในเบราว์เซอร์นี้',
     moreActions: 'ตัวเลือกเพิ่มเติม',
     deleteChat: 'ลบแชตนี้',
+    deleteShort: 'ลบ',
     conversationLabel: 'บทสนทนา',
     messagesLabel: 'ข้อความในการสนทนา',
     emptyTitle: 'สวัสดีครับ ผมคือผู้ช่วย AI ของทีม KUAi ถามได้เลยว่าอยากรู้อะไรเกี่ยวกับไอซ์ ภูมิ หรือวิว',
@@ -468,7 +471,19 @@ const handleNewConversation = () => {
                             {savedConversation.title}
                           </button>
 
-                          <div className="relative shrink-0">
+                          <div className="flex shrink-0 items-center gap-1 pr-1">
+                            {openMenuId === savedConversation.conversationId && (
+                              <button
+                                type="button"
+                                onClick={() => void handleDeleteConversation(savedConversation)}
+                                aria-label={`${copy.deleteChat}: ${savedConversation.title}`}
+                                className="inline-flex items-center gap-1.5 rounded-lg border border-red-400/30 bg-red-500/10 px-2.5 py-1.5 text-xs font-medium text-red-300 transition hover:bg-red-500/20"
+                              >
+                                <Trash2 size={13} />
+                                {copy.deleteShort}
+                              </button>
+                            )}
+
                             <button
                               type="button"
                               onClick={() => setOpenMenuId(
@@ -482,18 +497,6 @@ const handleNewConversation = () => {
                             >
                               <MoreHorizontal size={17} />
                             </button>
-
-                            {openMenuId === savedConversation.conversationId && (
-                              <button
-                                type="button"
-                                onClick={() => void handleDeleteConversation(savedConversation)}
-                                aria-label={`${copy.deleteChat}: ${savedConversation.title}`}
-                                className="absolute right-0 top-full z-50 inline-flex w-48 items-center gap-2 rounded-xl border border-white/15 bg-[#1d0f3d] px-3 py-2.5 text-left text-sm text-red-300 shadow-[0_16px_40px_-10px_rgb(0_0_0/0.8)] hover:bg-[#2a1450]"
-                              >
-                                <Trash2 size={14} />
-                                {copy.deleteChat}
-                              </button>
-                            )}
                           </div>
                         </li>
                       ))}
