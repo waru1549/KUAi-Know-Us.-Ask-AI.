@@ -601,10 +601,10 @@ export const portfolioData: PortfolioData = {
       },
       avatar: '/images/projects/member-3/member-3.jpg',
       mainContribution: {
-        en: 'Docker, CI/CD and automated testing',
-        th: 'Docker, CI/CD และ Automated Testing',
+        en: 'GitHub Actions CI/CD, automated deploys (Render + Vercel) and automated testing',
+        th: 'GitHub Actions CI/CD, Deploy อัตโนมัติ (Render + Vercel) และ Automated Testing',
       },
-      highlightSkills: ['Docker', 'GitHub Actions', 'Jest', 'Nginx', 'Linux Server'],
+      highlightSkills: ['GitHub Actions', 'Render', 'Vercel', 'Supabase', 'Vitest'],
       socialLinks: { 
         github: 'https://github.com/view-ttyp', 
         linkedin: '', 
@@ -615,27 +615,32 @@ export const portfolioData: PortfolioData = {
         glow: 'rgba(52, 211, 153, 0.35)',
       },
       skills: {
-        core: ['Docker', 'GitHub Actions', 'Linux Server'],
-        testing: ['Jest', 'Supertest', 'React Testing Library'],
-        webServer: ['Nginx', 'Docker Compose'],
+        core: ['GitHub Actions', 'Render', 'Vercel', 'Supabase (PostgreSQL)'],
+        testing: ['Vitest', 'React Testing Library', 'Node.js Test Runner', 'Manual QA'],
+        webServer: ['Render Web Service', 'Vercel Hosting', 'UptimeRobot'],
       },
       currentContributions: [
-        'Containerizing deployment environments',
-        'Orchestrating automated CI/CD workflows',
-        'Designing and executing core component integration and unit tests',
+        'Building the GitHub Actions CI pipeline (lint, type check, tests and build)',
+        'Automating production deploys to Render and Vercel through deploy hooks, gated by CI and checked with health and smoke tests',
+        'Writing backend unit tests and running the manual QA test plan',
+        'Managing environment variables and secrets, and writing the README and .env.example',
       ],
       responsibilities: [
         {
-          en: 'Containerizing deployment environments',
-          th: 'จัดเตรียมสภาพแวดล้อมสำหรับ Deployment ด้วย Container',
+          en: 'Building the GitHub Actions CI pipeline for the frontend and backend',
+          th: 'สร้าง CI pipeline ด้วย GitHub Actions สำหรับ frontend และ backend',
         },
         {
-          en: 'Orchestrating automated CI/CD workflows',
-          th: 'จัดการ Workflow สำหรับ CI/CD อัตโนมัติ',
+          en: 'Automating deploys to Render and Vercel, gated by CI with health checks and smoke tests',
+          th: 'ทำ Deploy อัตโนมัติไป Render และ Vercel ที่ต้องผ่าน CI ก่อน พร้อม health check และ smoke test',
         },
         {
-          en: 'Designing and executing integration and unit tests',
-          th: 'ออกแบบและดำเนินการทดสอบ Integration Tests และ Unit Tests',
+          en: 'Writing automated tests and running the manual QA test plan',
+          th: 'เขียน Automated Tests และทดสอบระบบตามแผน QA',
+        },
+        {
+          en: 'Managing secrets and environment variables, and documenting setup in the README',
+          th: 'ดูแล Secrets และ Environment Variables และเขียนคู่มือติดตั้งใน README',
         },
       ],
       previousProject: {
@@ -724,7 +729,7 @@ export const portfolioData: PortfolioData = {
         },
       ],
       contributors: ['member-1', 'member-2', 'member-3'],
-      status: 'in-progress',
+      status: 'completed',
       isFeatured: true,
       isPlaceholder: false,
     },

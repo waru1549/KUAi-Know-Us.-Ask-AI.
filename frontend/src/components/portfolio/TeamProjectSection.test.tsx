@@ -63,7 +63,7 @@ describe('TeamProjectSection Component', () => {
     ).toBeInTheDocument()
 
     expect(
-      screen.getByText('In Progress'),
+      screen.getByText('Completed'),
     ).toBeInTheDocument()
   })
 
@@ -87,7 +87,7 @@ describe('TeamProjectSection Component', () => {
     ).toBeInTheDocument()
 
     expect(
-      screen.getByText('กำลังพัฒนา'),
+      screen.getByText('เสร็จสมบูรณ์'),
     ).toBeInTheDocument()
   })
 

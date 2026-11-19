@@ -409,7 +409,7 @@ const handleNewConversation = () => {
 
         {/* Chat Header */}
 
-        <header className="mb-4 flex shrink-0 flex-wrap items-center justify-between gap-4">
+        <header className="relative mb-4 flex shrink-0 flex-wrap items-center justify-between gap-4">
 
           <div className="flex items-center gap-4">
             <span className="kuai-orb size-14 shrink-0 rounded-full" aria-hidden="true" />
@@ -427,7 +427,7 @@ const handleNewConversation = () => {
 
           <div className="flex flex-wrap items-center gap-3">
 
-            <div className="relative">
+            <div>
               <button
                 type="button"
                 onClick={() => {
@@ -443,7 +443,7 @@ const handleNewConversation = () => {
               </button>
 
               {isHistoryOpen && (
-                <div className="absolute right-0 top-full z-50 mt-2 w-[min(24rem,calc(100vw-2rem))] overflow-hidden rounded-2xl border border-white/15 bg-[#140b2e] shadow-[0_24px_60px_-12px_rgb(0_0_0/0.85)]">
+                <div className="absolute inset-x-0 top-full z-50 mt-2 overflow-hidden sm:left-auto sm:w-[24rem] rounded-2xl border border-white/15 bg-[#140b2e] shadow-[0_24px_60px_-12px_rgb(0_0_0/0.85)]">
                   <p className="border-b border-white/10 px-4 py-3 font-mono text-[11px] tracking-[0.2em] text-accent-magenta uppercase">
                     {copy.history}
                   </p>

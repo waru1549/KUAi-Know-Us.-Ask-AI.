@@ -158,4 +158,34 @@ describe('MessageBubble Component', () => {
 
   })
 
+
+  // TEST: MARKDOWN IN AI ANSWERS
+
+  it('should render Markdown bullets and bold text in assistant answers without raw asterisks', () => {
+    renderWithLanguage(
+      <MessageBubble
+        message={{
+          ...assistantMessage,
+          content:
+            'The team consists of 3 members:\n\n* **Ice** – Frontend\n* **Phum** – Backend\n* **View** – DevOps',
+        }}
+      />,
+    )
+
+    const items = screen.getAllByRole('listitem')
+    expect(items).toHaveLength(3)
+    expect(screen.getByText('Ice').tagName).toBe('STRONG')
+    expect(document.body.textContent).not.toContain('**')
+    expect(screen.getByText('The team consists of 3 members:')).toBeInTheDocument()
+  })
+
+  it('should keep user messages as plain text', () => {
+    renderWithLanguage(
+      <MessageBubble message={{ ...userMessage, content: '**not bold**' }} />,
+    )
+
+    expect(screen.getByText('**not bold**')).toBeInTheDocument()
+    expect(screen.queryByRole('listitem')).not.toBeInTheDocument()
+  })
+
 })
