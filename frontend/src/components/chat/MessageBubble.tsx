@@ -1,4 +1,5 @@
 
+import RichText from './RichText'
 import { useLanguage } from '../../contexts/language-context'
 
 import type { Language } from '../../data/portfolioData'
@@ -70,9 +71,13 @@ function MessageBubble({ message }: MessageBubbleProps) {
               : 'rounded-[4px_20px_20px_20px] border border-white/10 bg-white/7 text-slate-100'
           }`}
         >
-          <p className="whitespace-pre-wrap wrap-break-word text-[15px] leading-7">
-            {message.content}
-          </p>
+          {isUser ? (
+            <p className="whitespace-pre-wrap wrap-break-word text-[15px] leading-7">
+              {message.content}
+            </p>
+          ) : (
+            <RichText text={message.content} />
+          )}
         </div>
 
         <time
