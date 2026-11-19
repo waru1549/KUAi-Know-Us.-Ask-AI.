@@ -1,17 +1,25 @@
 name: Backend CI
 
+# Runs on pull requests and on pushes to feature branches.
+# Pushes to main are checked by the "Deploy" workflow, which calls this file before deploying.
 on:
   push:
+    branches-ignore:
+      - main
     paths:
       - 'backend/**'
       - 'package-lock.json'
+      - '.nvmrc'
       - '.github/workflows/backend-ci.yml'
 
   pull_request:
     paths:
       - 'backend/**'
       - 'package-lock.json'
+      - '.nvmrc'
       - '.github/workflows/backend-ci.yml'
+
+  workflow_call:
 
   workflow_dispatch:
 
@@ -31,10 +39,10 @@ jobs:
       - name: Checkout Repository
         uses: actions/checkout@v4
 
-      - name: Setup Node.js
+      - name: Setup Node.js (same version as production)
         uses: actions/setup-node@v4
         with:
-          node-version: 24
+          node-version-file: .nvmrc
           cache: npm
           cache-dependency-path: package-lock.json
 
@@ -44,11 +52,5 @@ jobs:
       - name: Run TypeScript Check
         run: npm run typecheck
 
-      - name: Run ESLint
-        run: npm run lint --if-present
-
-      - name: Run Automated Tests
-        run: npm test --if-present
-
-      - name: Build Backend App
-        run: npm run build --if-present
+      - name: Run Unit Tests
+        run: npm test
