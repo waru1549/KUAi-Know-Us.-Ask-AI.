@@ -1,9 +1,10 @@
 
-import { useEffect, useState } from 'react'
+import { useCallback, useEffect, useState } from 'react'
 import {
   Navigate,
   Route,
   Routes,
+  useLocation,
   useMatch,
 } from 'react-router'
 
@@ -11,6 +12,7 @@ import PortfolioPage, { MemberProfilePage } from './pages/PortfolioPage'
 import ChatPage from './pages/ChatPage'
 import GalaxyBackground from './components/layout/GalaxyBackground'
 import IntroScreen from './components/layout/IntroScreen'
+import WarpFlash from './components/space/WarpFlash'
 import { shouldShowIntro } from './components/layout/introStorage'
 import { useLanguage } from './contexts/language-context'
 import { PortfolioDataContext } from './data/portfolioData'
@@ -78,10 +80,21 @@ function App() {
   // The animated intro plays once per tab session, only when the visitor lands on the home page.
   const [showIntro, setShowIntro] = useState(() => isHomeRoute && shouldShowIntro())
 
+  // A short light-speed burst whenever the visitor travels into the chat.
+  const { pathname } = useLocation()
+  const [previousPath, setPreviousPath] = useState(pathname)
+  const [warp, setWarp] = useState(0)
+  if (pathname !== previousPath) {
+    setPreviousPath(pathname)
+    if (pathname === '/chat') setWarp((value) => value + 1)
+  }
+  const endWarp = useCallback(() => setWarp(0), [])
+
   return (
     <>
     <GalaxyBackground spiralPosition={isChatRoute ? 'bottom-left' : 'top-right'} />
     {showIntro && <IntroScreen onFinish={() => setShowIntro(false)} />}
+    {warp > 0 && <WarpFlash key={warp} onDone={endWarp} />}
     <Routes>
 
       {/* Main Portfolio Page */}

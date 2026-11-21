@@ -14,6 +14,8 @@ import TechMarquee from '../components/portfolio/TechMarquee'
 import TeamShowcase from '../components/portfolio/TeamShowcase'
 import WorkShowcase from '../components/portfolio/WorkShowcase'
 import ContactShowcase from '../components/portfolio/ContactShowcase'
+import ScrollShip from '../components/space/ScrollShip'
+import ShipFlyby from '../components/space/ShipFlyby'
 import { useLanguage } from '../contexts/language-context'
 import { usePortfolioData } from '../data/portfolioData'
 
@@ -65,6 +67,10 @@ function PortfolioPage() {
     <div className="min-h-screen bg-transparent text-white">
 
       <Navbar />
+
+      {/* Space touches: a ship drifting past and a ship that marks scroll position */}
+      <ShipFlyby />
+      <ScrollShip />
 
       <main>
         {/* Group Hero */}

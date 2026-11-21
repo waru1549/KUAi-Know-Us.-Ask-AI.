@@ -104,7 +104,7 @@ function WorkShowcase() {
       <div className="mx-auto max-w-7xl px-5 py-28 sm:py-36 lg:px-8">
         <SectionTitle
           id="projects-heading"
-          label="02 / SELECTED WORK"
+          label="02 / MISSIONS"
           firstLine="IDEAS THAT"
           secondLine="SHIPPED."
         />

@@ -53,7 +53,7 @@ function MemberShowcaseCard({ member, index, language }: MemberShowcaseCardProps
   return (
     <article
       aria-labelledby={`showcase-${member.id}-name`}
-      className="kuai-ring kuai-lift kuai-glass group flex flex-col overflow-hidden rounded-[28px] border border-white/10 bg-surface-900"
+      className="kuai-ring kuai-lift kuai-glass kuai-holo-card group flex flex-col overflow-hidden rounded-[28px] border border-white/10 bg-surface-900"
       style={{ '--kuai-ring-color': color } as CSSProperties}
     >
       {/* Photo */}
@@ -146,6 +146,10 @@ function MemberShowcaseCard({ member, index, language }: MemberShowcaseCardProps
           {isThai ? `ถาม AI เกี่ยวกับ${nickname} →` : `Ask AI about ${member.nickname} →`}
         </Link>
       </div>
+
+      {/* Hologram overlay, shown on hover / keyboard focus */}
+      <div aria-hidden="true" className="kuai-holo-scan" />
+      <div aria-hidden="true" className="kuai-holo-sweep" />
     </article>
   )
 }
@@ -170,7 +174,7 @@ function TeamShowcase() {
       <div className="flex flex-wrap items-end justify-between gap-8">
         <SectionTitle
           id="members-heading"
-          label="01 / THE TEAM"
+          label="01 / CREW"
           firstLine="THREE MINDS."
           secondLine="ONE CONVERSATION."
         />
