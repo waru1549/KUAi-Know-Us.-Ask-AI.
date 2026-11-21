@@ -4,6 +4,7 @@ import { ArrowRight, ChevronLeft, ChevronRight } from 'lucide-react'
 import { useLanguage } from '../../contexts/language-context'
 import type { Language } from '../../data/portfolioData'
 import SpaceShip from '../space/SpaceShip'
+import { startGalaxy } from '../space/galaxy'
 import { rememberIntroSeen } from './introStorage'
 
 /* -------------------------------------------------------------------------- */
@@ -12,6 +13,7 @@ import { rememberIntroSeen } from './introStorage'
 
 const LAUNCH_MS = 2150 // ship shakes, launches, stars stretch, flash
 const LEAVE_MS = 800
+const DIVE_MS = 5000 // ship launches from below and dives into a spiral galaxy, then the portfolio fades in
 const ORBIT_DEG_PER_FRAME = 0.12
 const PAUSE_AFTER_INPUT_MS = 4500
 const SIDE_BY_SIDE_MIN_WIDTH = 1200
@@ -429,6 +431,26 @@ function HoloGlobe({ label }: { label: string }) {
   )
 }
 
+/** The ship rises from the bottom centre and dives into a rotating spiral galaxy. */
+function GalaxyDive() {
+  const canvasRef = useRef<HTMLCanvasElement>(null)
+
+  useEffect(() => {
+    const canvas = canvasRef.current
+    if (!canvas) return
+    return startGalaxy(canvas, DIVE_MS / 1000)
+  }, [])
+
+  return (
+    <div className="intro-galaxy" aria-hidden="true">
+      <canvas ref={canvasRef} className="intro-galaxy-canvas" />
+      <div className="intro-dive-trail" />
+      <div className="intro-dive-ship"><SpaceShip /></div>
+      <div className="intro-core-flash" />
+    </div>
+  )
+}
+
 function orbitRadius(): number {
   if (window.innerWidth < 520) return 104
   if (window.innerWidth < SIDE_BY_SIDE_MIN_WIDTH) return 220
@@ -582,7 +604,7 @@ function HoloOrbit({
 /* Intro journey: ship → warp → crew + works holograms → portfolio             */
 /* -------------------------------------------------------------------------- */
 
-type Phase = 'ship' | 'launch' | 'holo'
+type Phase = 'ship' | 'launch' | 'holo' | 'dive'
 type HoloView = 'crew' | 'works'
 
 interface IntroScreenProps {
@@ -649,6 +671,19 @@ function IntroScreen({ onFinish }: IntroScreenProps) {
     timersRef.current.push(window.setTimeout(onFinish, LEAVE_MS))
   }, [leaving, onFinish])
 
+  // "Enter": the ship launches from the bottom and dives into the galaxy core.
+  const dive = useCallback(() => {
+    if (leaving || phase === 'dive') return
+    if (reduceMotion) {
+      leave()
+      return
+    }
+    rememberIntroSeen()
+    speedRef.current = 0.2
+    setPhase('dive')
+    timersRef.current.push(window.setTimeout(onFinish, DIVE_MS))
+  }, [leave, leaving, onFinish, phase, reduceMotion])
+
   const launch = useCallback(() => {
     if (phase !== 'ship') return
     if (reduceMotion) {
@@ -700,7 +735,7 @@ function IntroScreen({ onFinish }: IntroScreenProps) {
   return (
     <section
       aria-label={copy.region}
-      className={`intro fixed inset-0 z-[100] overflow-hidden bg-[#05030f] text-white ${leaving ? 'intro--leaving' : ''}`}
+      className={`intro fixed inset-0 z-[100] overflow-hidden bg-[#05030f] text-white ${leaving ? 'intro--leaving' : ''} ${phase === 'dive' ? 'intro--galaxy' : ''}`}
     >
       <canvas ref={canvasRef} className="absolute inset-0 size-full" aria-hidden="true" />
       <div aria-hidden="true" className="intro-nebula" />
@@ -736,7 +771,7 @@ function IntroScreen({ onFinish }: IntroScreenProps) {
       )}
 
       {/* Scene 2: two holo-globes, the crew and our works */}
-      {phase === 'holo' && (
+      {(phase === 'holo' || phase === 'dive') && (
         <div className="intro-scene intro-scene--holo">
           <p className="font-mono text-[11px] tracking-[0.3em] text-accent-magenta">◉ {copy.transmission}</p>
 
@@ -837,7 +872,7 @@ function IntroScreen({ onFinish }: IntroScreenProps) {
           <button
             ref={enterRef}
             type="button"
-            onClick={leave}
+            onClick={dive}
             className="kuai-gradient-button mt-3 inline-flex min-h-12 items-center gap-2 rounded-full px-7 text-[15px] font-semibold text-white focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-accent-magenta"
           >
             {copy.enter}
@@ -845,6 +880,9 @@ function IntroScreen({ onFinish }: IntroScreenProps) {
           </button>
         </div>
       )}
+
+      {/* Scene 3: dive into the galaxy, then the portfolio fades in */}
+      {phase === 'dive' && <GalaxyDive />}
     </section>
   )
 }

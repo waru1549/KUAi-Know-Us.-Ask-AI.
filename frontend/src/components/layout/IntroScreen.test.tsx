@@ -102,6 +102,24 @@ describe('IntroScreen Component', () => {
     expect(worksButton).toHaveAttribute('aria-pressed', 'true')
   })
 
+  it('should dive into the galaxy and then open the portfolio after Enter', () => {
+    const onFinish = vi.fn()
+    renderWithLanguage(<IntroScreen onFinish={onFinish} />)
+
+    fireEvent.click(screen.getByRole('button', { name: 'GO — launch the ship' }))
+    act(() => {
+      vi.advanceTimersByTime(2500)
+    })
+    fireEvent.click(screen.getByRole('button', { name: /Enter the portfolio/ }))
+    expect(shouldShowIntro()).toBe(false)
+    expect(onFinish).not.toHaveBeenCalled()
+
+    act(() => {
+      vi.advanceTimersByTime(5200)
+    })
+    expect(onFinish).toHaveBeenCalledTimes(1)
+  })
+
   it('should finish and remember the intro when skipped', () => {
     const onFinish = vi.fn()
     renderWithLanguage(<IntroScreen onFinish={onFinish} />)
