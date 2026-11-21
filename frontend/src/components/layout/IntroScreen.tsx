@@ -751,7 +751,7 @@ function IntroScreen({ onFinish }: IntroScreenProps) {
       </button>
 
       {/* Scene 1: the KUAi ship floats, waiting for GO */}
-      {phase !== 'holo' && (
+      {(phase === 'ship' || phase === 'launch') && (
         <div className={`intro-scene ${phase === 'launch' ? 'intro-scene--launch' : ''}`}>
           <p className="intro-fade font-mono text-xs tracking-[0.35em] text-accent-cyan">{copy.kicker}</p>
           <h1 className="intro-fade mt-3 text-center font-display text-[clamp(2rem,5vw,3.4rem)] font-extrabold leading-[1.05] tracking-[-0.03em]">

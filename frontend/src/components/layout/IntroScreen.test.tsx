@@ -113,6 +113,9 @@ describe('IntroScreen Component', () => {
     fireEvent.click(screen.getByRole('button', { name: /Enter the portfolio/ }))
     expect(shouldShowIntro()).toBe(false)
     expect(onFinish).not.toHaveBeenCalled()
+    // The ship scene must not come back during the dive.
+    expect(screen.queryByRole('button', { name: 'GO — launch the ship' })).not.toBeInTheDocument()
+    expect(screen.queryByText('Ready for launch')).not.toBeInTheDocument()
 
     act(() => {
       vi.advanceTimersByTime(5200)
