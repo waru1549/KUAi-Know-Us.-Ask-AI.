@@ -533,14 +533,14 @@ textarea {
 @keyframes intro-galaxy-in { 0%, 3% { opacity: 0; } 14% { opacity: 1; } 66% { opacity: 1; } 94%, 100% { opacity: 0; } }
 
 /* the ship rises from the bottom centre and shrinks into the core */
-.intro-dive-ship { position: absolute; left: 50%; top: 46%; width: min(68vw, 470px); opacity: 0; animation: intro-dive 3.6s forwards; }
+.intro-dive-ship { position: absolute; left: 50%; top: 46%; width: min(30vw, 190px); opacity: 0; animation: intro-dive 3.6s forwards; }
 .intro-dive-ship svg { width: 100%; display: block; overflow: visible; filter: drop-shadow(0 0 30px rgb(56 189 248 / .45)) drop-shadow(0 20px 30px rgb(0 0 0 / .5)); }
 .kuai-rear-glow { transform-box: fill-box; transform-origin: 50% 20%; animation: kuai-rear-glow .14s steps(2) infinite alternate; }
 @keyframes kuai-rear-glow { from { transform: scale(1, 1); opacity: .9; } to { transform: scale(1.08, 1.18); opacity: 1; } }
 @keyframes intro-dive {
-  0%, 7% { transform: translate(-50%, -50%) translateY(62vh) scale(1.3); opacity: 0; animation-timing-function: cubic-bezier(.35,0,.85,.45); }
+  0%, 7% { transform: translate(-50%, -50%) translateY(46vh) scale(1); opacity: 0; animation-timing-function: cubic-bezier(.35,0,.85,.45); }
   9% { opacity: 1; }
-  40% { transform: translate(-50%, -50%) translateY(0) scale(.03); opacity: 1; }
+  40% { transform: translate(-50%, -50%) translateY(0) scale(.05); opacity: 1; }
   42%, 100% { transform: translate(-50%, -50%) scale(.02); opacity: 0; }
 }
 /* faint exhaust trail behind the ship */
