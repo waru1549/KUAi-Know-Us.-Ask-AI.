@@ -534,8 +534,8 @@ textarea {
 
 /* the ship rises from the bottom centre and shrinks into the core */
 .intro-dive-ship { position: absolute; left: 50%; top: 46%; width: min(30vw, 190px); opacity: 0; animation: intro-dive 3.6s forwards; }
-/* only the ship's shadow: a dark silhouette with a faint rim of galaxy light */
-.intro-dive-ship svg { width: 100%; display: block; overflow: visible; filter: brightness(0) drop-shadow(0 0 1px rgb(196 181 253 / .9)) drop-shadow(0 0 8px rgb(167 139 250 / .55)); opacity: .92; }
+/* only the ship's shadow: a faint white silhouette with a soft glow */
+.intro-dive-ship svg { width: 100%; display: block; overflow: visible; filter: brightness(0) invert(1) drop-shadow(0 0 10px rgb(255 255 255 / .6)); opacity: .38; }
 .intro-dive-trail { display: none; }
 .kuai-rear-glow { transform-box: fill-box; transform-origin: 50% 20%; animation: kuai-rear-glow .14s steps(2) infinite alternate; }
 @keyframes kuai-rear-glow { from { transform: scale(1, 1); opacity: .9; } to { transform: scale(1.08, 1.18); opacity: 1; } }
