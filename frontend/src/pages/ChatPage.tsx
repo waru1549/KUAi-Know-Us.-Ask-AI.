@@ -23,6 +23,7 @@ import type { Language } from '../data/portfolioData'
 import MessageBubble from '../components/chat/MessageBubble'
 import TypingIndicator from '../components/chat/TypingIndicator'
 import ChatComposer from '../components/chat/ChatComposer'
+import SatelliteAvatar from '../components/space/SatelliteAvatar'
 
 import {
   deleteChatConversation,
@@ -415,7 +416,7 @@ const handleNewConversation = () => {
         <header className="relative mb-4 flex shrink-0 flex-wrap items-center justify-between gap-4">
 
           <div className="flex items-center gap-4">
-            <span className="kuai-orb size-14 shrink-0 rounded-full" aria-hidden="true" />
+            <SatelliteAvatar size="lg" online />
 
             <div>
               <h1 className="font-display text-3xl font-extrabold tracking-[-0.03em] text-white">

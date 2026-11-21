@@ -60,7 +60,7 @@ function ContactShowcase() {
           <div className="flex-[1_1_520px]">
             <SectionTitle
               id="contact-heading"
-              label="03 / GET IN TOUCH"
+              label="03 / TRANSMIT"
               firstLine="LET’S BUILD"
               secondLine="SOMETHING."
               secondLineStyle="shine"

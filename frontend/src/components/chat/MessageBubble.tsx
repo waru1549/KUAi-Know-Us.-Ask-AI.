@@ -1,5 +1,6 @@
 
 import RichText from './RichText'
+import SatelliteAvatar from '../space/SatelliteAvatar'
 import { useLanguage } from '../../contexts/language-context'
 
 import type { Language } from '../../data/portfolioData'
@@ -45,14 +46,7 @@ function MessageBubble({ message }: MessageBubbleProps) {
       }`}
     >
       {/* AI Avatar */}
-      {!isUser && (
-        <div
-          className="grid size-9 shrink-0 place-items-center rounded-xl bg-linear-to-br from-fuchsia-500 via-violet-600 to-cyan-400 font-display text-xs font-extrabold text-white"
-          aria-hidden="true"
-        >
-          Ai
-        </div>
-      )}
+      {!isUser && <SatelliteAvatar />}
 
       <div
         className={`flex min-w-0 max-w-[85%] flex-col gap-1 sm:max-w-[75%] ${

@@ -1,6 +1,6 @@
 interface SectionTitleProps {
   id: string
-  /** Small mono label, e.g. "01 / THE TEAM" */
+  /** Small mono label, e.g. "01 / CREW" */
   label: string
   firstLine: string
   secondLine: string
@@ -19,6 +19,7 @@ function SectionTitle({
   return (
     <div>
       <p className="mb-5 font-mono text-xs tracking-[0.22em] text-accent-magenta">
+        <span className="kuai-signal-dot" aria-hidden="true" />
         {label}
       </p>
 
