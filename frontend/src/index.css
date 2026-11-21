@@ -533,15 +533,17 @@ textarea {
 @keyframes intro-galaxy-in { 0%, 4% { opacity: 0; } 20% { opacity: 1; } 78% { opacity: 1; } 97%, 100% { opacity: 0; } }
 
 /* the ship rises from the bottom centre and shrinks into the core */
-.intro-dive-ship { position: absolute; left: 50%; top: 46%; width: min(44vw, 320px); opacity: 0; animation: intro-dive 5s forwards; }
-.intro-dive-ship svg { width: 100%; display: block; overflow: visible; transform: rotate(90deg); filter: drop-shadow(0 0 26px rgb(56 189 248 / .55)); }
-.intro-dive-ship .kuai-ship-flame { animation-duration: .06s; transform: scaleX(1.6); }
+.intro-dive-ship { position: absolute; left: 50%; top: 46%; width: min(68vw, 470px); opacity: 0; animation: intro-dive 5s forwards; }
+.intro-dive-ship svg { width: 100%; display: block; overflow: visible; filter: drop-shadow(0 0 30px rgb(56 189 248 / .45)) drop-shadow(0 20px 30px rgb(0 0 0 / .5)); }
+.kuai-rear-glow { transform-box: fill-box; transform-origin: 50% 20%; animation: kuai-rear-glow .14s steps(2) infinite alternate; }
+@keyframes kuai-rear-glow { from { transform: scale(1, 1); opacity: .9; } to { transform: scale(1.08, 1.18); opacity: 1; } }
 @keyframes intro-dive {
-  0%, 6% { transform: translate(-50%, -50%) translateY(72vh) scale(1.35); opacity: 0; animation-timing-function: cubic-bezier(.2,.6,.35,1); }
-  11% { opacity: 1; }
-  34% { transform: translate(-50%, -50%) translateY(30vh) scale(.78); animation-timing-function: cubic-bezier(.4,0,.6,1); }
-  50% { transform: translate(-50%, -50%) translateY(10vh) scale(.34); opacity: 1; animation-timing-function: cubic-bezier(.5,0,.9,.5); }
-  62% { transform: translate(-50%, -50%) translateY(0) scale(.04); opacity: 1; }
+  0%, 4% { transform: translate(-50%, -50%) translateY(62vh) scale(1.25) rotate(0deg); opacity: 0; animation-timing-function: cubic-bezier(.2,.6,.3,1); }
+  9% { opacity: 1; }
+  22% { transform: translate(-50%, -50%) translateY(30vh) scale(1) rotate(-3deg); animation-timing-function: ease-in-out; }
+  38% { transform: translate(-50%, -50%) translateY(16vh) scale(.62) rotate(2deg); animation-timing-function: cubic-bezier(.45,0,.85,.55); }
+  52% { transform: translate(-50%, -50%) translateY(5vh) scale(.24) rotate(-1deg); opacity: 1; }
+  62% { transform: translate(-50%, -50%) translateY(0) scale(.035) rotate(0deg); opacity: 1; }
   64%, 100% { transform: translate(-50%, -50%) scale(.02); opacity: 0; }
 }
 /* faint exhaust trail behind the ship */

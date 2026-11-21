@@ -4,6 +4,7 @@ import { ArrowRight, ChevronLeft, ChevronRight } from 'lucide-react'
 import { useLanguage } from '../../contexts/language-context'
 import type { Language } from '../../data/portfolioData'
 import SpaceShip from '../space/SpaceShip'
+import SpaceShipRear from '../space/SpaceShipRear'
 import { startGalaxy } from '../space/galaxy'
 import { rememberIntroSeen } from './introStorage'
 
@@ -431,7 +432,7 @@ function HoloGlobe({ label }: { label: string }) {
   )
 }
 
-/** The ship rises from the bottom centre and dives into a rotating spiral galaxy. */
+/** Seen from behind, the ship rises from the bottom centre and dives into a rotating spiral galaxy. */
 function GalaxyDive() {
   const canvasRef = useRef<HTMLCanvasElement>(null)
 
@@ -445,7 +446,7 @@ function GalaxyDive() {
     <div className="intro-galaxy" aria-hidden="true">
       <canvas ref={canvasRef} className="intro-galaxy-canvas" />
       <div className="intro-dive-trail" />
-      <div className="intro-dive-ship"><SpaceShip /></div>
+      <div className="intro-dive-ship"><SpaceShipRear /></div>
       <div className="intro-core-flash" />
     </div>
   )
