@@ -14,7 +14,7 @@ import { rememberIntroSeen } from './introStorage'
 
 const LAUNCH_MS = 2150 // ship shakes, launches, stars stretch, flash
 const LEAVE_MS = 800
-const DIVE_MS = 5000 // ship launches from below and dives into a spiral galaxy, then the portfolio fades in
+const DIVE_MS = 3600 // ship launches from below and dives into a spiral galaxy, then the portfolio fades in
 const ORBIT_DEG_PER_FRAME = 0.12
 const PAUSE_AFTER_INPUT_MS = 4500
 const SIDE_BY_SIDE_MIN_WIDTH = 1200

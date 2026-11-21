@@ -73,9 +73,11 @@ export function startGalaxy(canvas: HTMLCanvasElement, duration = 5): () => void
   const draw = (now: number): void => {
     const t = (now - t0) / 1000;
     // slow approach, then dive into the core
-    let zoom = 0.78 + 0.22 * Math.min(1, t / 3.2);
-    if (t > 3.0) zoom *= 1 + Math.pow(Math.min(1, (t - 3.0) / 1.7), 2.6) * 7;
-    const flash = Math.exp(-Math.pow((t - 3.1) / 0.28, 2));
+    // the ship reaches the core at 40% of the timeline; the camera follows it in
+    const diveAt = DURATION * 0.4
+    let zoom = 0.78 + 0.16 * Math.min(1, t / diveAt)
+    if (t > diveAt) zoom *= 1 + Math.pow(Math.min(1, (t - diveAt) / (DURATION * 0.38)), 2.4) * 7
+    const flash = Math.exp(-Math.pow((t - DURATION * 0.42) / 0.22, 2))
 
     ctx.globalCompositeOperation = 'source-over';
     ctx.fillStyle = '#03020a';
