@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useRef, useState } from 'react'
+import { useCallback, useEffect, useId, useRef, useState, type ReactNode } from 'react'
 import { ArrowRight, ChevronLeft, ChevronRight } from 'lucide-react'
 
 import { useLanguage } from '../../contexts/language-context'
@@ -14,11 +14,12 @@ const LAUNCH_MS = 2150 // ship shakes, launches, stars stretch, flash
 const LEAVE_MS = 800
 const ORBIT_DEG_PER_FRAME = 0.12
 const PAUSE_AFTER_INPUT_MS = 4500
+const SIDE_BY_SIDE_MIN_WIDTH = 1200
 
 const apiBaseUrl = (import.meta.env.VITE_API_BASE_URL?.trim() ?? '').replace(/\/+$/, '')
 
 /* -------------------------------------------------------------------------- */
-/* Crew shown on the hologram (live data with a built-in fallback)             */
+/* Hologram content: crew and works (live data with a built-in fallback)       */
 /* -------------------------------------------------------------------------- */
 
 interface Pair {
@@ -36,38 +37,85 @@ interface CrewCard {
   avatar?: string
 }
 
-const FALLBACK_CREW: readonly CrewCard[] = [
-  {
-    id: 'member-1',
-    nickname: { en: 'Ice', th: 'ไอซ์' },
-    fullName: { en: 'Warunee Kludpan', th: 'วารุณี กลัดพันธ์' },
-    role: 'Frontend Developer & UI/UX Designer',
-    contribution: { en: 'Portfolio UI, chat UI and state management', th: 'Portfolio UI, Chat UI และ State Management' },
-    skills: ['React', 'TypeScript', 'Tailwind CSS', 'Figma'],
-    avatar: '/images/projects/member-1/member-1.jpg',
-  },
-  {
-    id: 'member-2',
-    nickname: { en: 'Phum', th: 'ภูมิ' },
-    fullName: { en: 'Thanakrit Archawabool', th: 'ธนกฤต อาชะวะบูล' },
-    role: 'Backend Developer & Database Engineer',
-    contribution: { en: 'Express API, PostgreSQL and AI context injection', th: 'Express API, PostgreSQL และ AI Context Injection' },
-    skills: ['Node.js', 'Express', 'PostgreSQL', 'Prompt Engineering'],
-    avatar: '/images/projects/member-2/member-2.jpeg',
-  },
-  {
-    id: 'member-3',
-    nickname: { en: 'View', th: 'วิว' },
-    fullName: { en: 'Thitiyaporn Mekcha-um', th: 'ฐิติญาภรณ์ เมฆชะอุ้ม' },
-    role: 'DevOps & Full-Stack QA Engineer',
-    contribution: {
-      en: 'GitHub Actions CI/CD, automated deploys (Render + Vercel) and automated testing',
-      th: 'GitHub Actions CI/CD, Deploy อัตโนมัติ (Render + Vercel) และ Automated Testing',
+interface WorkCard {
+  id: string
+  tag: Pair
+  title: Pair
+  description: Pair
+  cover?: string
+}
+
+interface HologramData {
+  crew: readonly CrewCard[]
+  works: readonly WorkCard[]
+}
+
+const FALLBACK: HologramData = {
+  crew: [
+    {
+      id: 'member-1',
+      nickname: { en: 'Ice', th: 'ไอซ์' },
+      fullName: { en: 'Warunee Kludpan', th: 'วารุณี กลัดพันธ์' },
+      role: 'Frontend Developer & UI/UX Designer',
+      contribution: { en: 'Portfolio UI, chat UI and state management', th: 'Portfolio UI, Chat UI และ State Management' },
+      skills: ['React', 'TypeScript', 'Tailwind CSS', 'Figma'],
+      avatar: '/images/projects/member-1/member-1.jpg',
     },
-    skills: ['GitHub Actions', 'Render', 'Vercel', 'Vitest'],
-    avatar: '/images/projects/member-3/member-3.jpg',
-  },
-]
+    {
+      id: 'member-2',
+      nickname: { en: 'Phum', th: 'ภูมิ' },
+      fullName: { en: 'Thanakrit Archawabool', th: 'ธนกฤต อาชะวะบูล' },
+      role: 'Backend Developer & Database Engineer',
+      contribution: { en: 'Express API, PostgreSQL and AI context injection', th: 'Express API, PostgreSQL และ AI Context Injection' },
+      skills: ['Node.js', 'Express', 'PostgreSQL', 'Prompt Engineering'],
+      avatar: '/images/projects/member-2/member-2.jpeg',
+    },
+    {
+      id: 'member-3',
+      nickname: { en: 'View', th: 'วิว' },
+      fullName: { en: 'Thitiyaporn Mekcha-um', th: 'ฐิติญาภรณ์ เมฆชะอุ้ม' },
+      role: 'DevOps & Full-Stack QA Engineer',
+      contribution: {
+        en: 'GitHub Actions CI/CD, automated deploys (Render + Vercel) and automated testing',
+        th: 'GitHub Actions CI/CD, Deploy อัตโนมัติ (Render + Vercel) และ Automated Testing',
+      },
+      skills: ['GitHub Actions', 'Render', 'Vercel', 'Vitest'],
+      avatar: '/images/projects/member-3/member-3.jpg',
+    },
+  ],
+  works: [
+    {
+      id: 'chat-ai-with-group-portfolio',
+      tag: { en: 'TEAM PROJECT · LIVE', th: 'โปรเจกต์ทีม · LIVE' },
+      title: { en: 'KUAi — Chat AI with Group Portfolio', th: 'KUAi — แชต AI พร้อม Portfolio ของกลุ่ม' },
+      description: {
+        en: 'A team portfolio where visitors ask an AI about our members, skills and projects in real time.',
+        th: 'เว็บ Portfolio ของทีมที่ถาม AI เกี่ยวกับสมาชิก ทักษะ และผลงานได้แบบเรียลไทม์',
+      },
+      cover: '/images/projects/kuai.png',
+    },
+    {
+      id: 'member-1-project-1',
+      tag: { en: 'BY ICE · UX/UI DESIGN + COMPUTER VISION', th: 'โดย ไอซ์ · UX/UI DESIGN + COMPUTER VISION' },
+      title: { en: 'Smart Lab Booking System', th: 'ระบบจองห้องปฏิบัติการอัจฉริยะ' },
+      description: {
+        en: 'Real-time lab booking with camera-based seat detection for the AIE Laboratory.',
+        th: 'ระบบจองห้องแล็บแบบเรียลไทม์ ใช้กล้องตรวจจับการใช้ที่นั่งของห้องปฏิบัติการ AIE',
+      },
+      cover: '/images/projects/member-1/smart-lab-booking.png',
+    },
+    {
+      id: 'member-2-project-1',
+      tag: { en: 'BY PHUM · WEB', th: 'โดย ภูมิ · เว็บ' },
+      title: { en: 'Bangkok University School of Engineering Website', th: 'เว็บไซต์คณะวิศวกรรมศาสตร์ มหาวิทยาลัยกรุงเทพ' },
+      description: {
+        en: 'A multilingual website for the School of Engineering, Bangkok University.',
+        th: 'เว็บไซต์หลายภาษาของคณะวิศวกรรมศาสตร์ มหาวิทยาลัยกรุงเทพ',
+      },
+      cover: '/images/projects/member-2/member-2-project-1.png',
+    },
+  ],
+}
 
 type MaybePair = { en?: string; th?: string } | undefined
 
@@ -75,18 +123,49 @@ function pick(value: MaybePair, fallback: Pair): Pair {
   return { en: value?.en?.trim() || fallback.en, th: value?.th?.trim() || fallback.th }
 }
 
-/** Turn the /api/portfolio members into hologram cards, keeping fallback values for gaps. */
-function toCrew(result: unknown): readonly CrewCard[] | null {
-  if (typeof result !== 'object' || result === null || !('members' in result)) return null
-  const members = (result as { members: unknown }).members
-  if (!Array.isArray(members) || members.length !== FALLBACK_CREW.length) return null
+function shorten(text: string, max = 130): string {
+  const clean = text.trim()
+  if (clean.length <= max) return clean
+  const cut = clean.slice(0, max)
+  return `${cut.slice(0, Math.max(cut.lastIndexOf(' '), max - 20)).trim()}…`
+}
 
-  return members.map((raw, index) => {
-    const base = FALLBACK_CREW[index]
-    const m = (raw ?? {}) as {
-      id?: string; nickname?: string; fullName?: string; avatar?: string; highlightSkills?: string[]
-      nicknameI18n?: MaybePair; fullNameI18n?: MaybePair; roleNameI18n?: MaybePair; mainContribution?: MaybePair
-    }
+interface ApiProject {
+  id?: string
+  title?: MaybePair
+  description?: MaybePair
+  projectType?: MaybePair
+  technologies?: string[]
+  coverImage?: string
+  isPlaceholder?: boolean
+  isHighlighted?: boolean
+  isFeatured?: boolean
+}
+
+interface ApiMember {
+  id?: string
+  nickname?: string
+  fullName?: string
+  avatar?: string
+  highlightSkills?: string[]
+  nicknameI18n?: MaybePair
+  fullNameI18n?: MaybePair
+  roleNameI18n?: MaybePair
+  mainContribution?: MaybePair
+  projects?: ApiProject[]
+}
+
+/**
+ * Turn /api/portfolio into hologram cards, mirroring the Missions section:
+ * the featured team project, then up to two highlighted member projects (one per member).
+ */
+function toHologramData(result: unknown): HologramData | null {
+  if (typeof result !== 'object' || result === null || !('members' in result)) return null
+  const members = (result as { members: unknown }).members as ApiMember[]
+  if (!Array.isArray(members) || members.length !== FALLBACK.crew.length) return null
+
+  const crew = members.map((m, index) => {
+    const base = FALLBACK.crew[index]
     return {
       id: m.id ?? base.id,
       nickname: pick(m.nicknameI18n ?? { en: m.nickname, th: m.nickname }, base.nickname),
@@ -97,6 +176,48 @@ function toCrew(result: unknown): readonly CrewCard[] | null {
       avatar: m.avatar || base.avatar,
     }
   })
+
+  const works: WorkCard[] = []
+  const teamProjects = (result as { teamProjects?: ApiProject[] }).teamProjects ?? []
+  const featured = teamProjects.find((project) => project.isFeatured) ?? teamProjects[0]
+  if (featured?.title) {
+    const title = pick(featured.title, FALLBACK.works[0].title)
+    works.push({
+      id: featured.id ?? 'team-project',
+      tag: FALLBACK.works[0].tag,
+      title: {
+        en: title.en.includes('KUAi') ? title.en : `KUAi — ${title.en}`,
+        th: title.th.includes('KUAi') ? title.th : `KUAi — ${title.th}`,
+      },
+      description: { en: shorten(pick(featured.description, FALLBACK.works[0].description).en), th: shorten(pick(featured.description, FALLBACK.works[0].description).th) },
+      cover: featured.coverImage || FALLBACK.works[0].cover,
+    })
+  }
+
+  const candidates = members.flatMap((member, index) =>
+    (member.projects ?? [])
+      .filter((project) => !project.isPlaceholder && (project.title?.en?.trim() || project.title?.th?.trim()))
+      .map((project) => ({ project, member, nickname: crew[index].nickname })),
+  )
+  const score = (item: { project: ApiProject }) => (item.project.isHighlighted ? 2 : 0) + (item.project.coverImage ? 1 : 0)
+  const usedMembers = new Set<string | undefined>()
+  for (const item of [...candidates].sort((a, b) => score(b) - score(a))) {
+    if (works.length === 3) break
+    if (usedMembers.has(item.member.id)) continue
+    usedMembers.add(item.member.id)
+    const type = item.project.projectType?.en?.trim() || (item.project.technologies ?? []).slice(0, 2).join(' + ')
+    const typeTh = item.project.projectType?.th?.trim() || type
+    const description = pick(item.project.description, { en: '', th: '' })
+    works.push({
+      id: item.project.id ?? `${item.member.id}-work`,
+      tag: { en: `BY ${item.nickname.en.toUpperCase()} · ${type.toUpperCase()}`, th: `โดย ${item.nickname.th} · ${typeTh}` },
+      title: pick(item.project.title, { en: 'Project', th: 'ผลงาน' }),
+      description: { en: shorten(description.en), th: shorten(description.th) },
+      cover: item.project.coverImage,
+    })
+  }
+
+  return { crew, works: works.length >= 2 ? works : FALLBACK.works }
 }
 
 /* -------------------------------------------------------------------------- */
@@ -112,6 +233,8 @@ interface IntroCopy {
   hint: string
   skip: string
   transmission: string
+  crew: string
+  works: string
   enter: string
   prev: string
   next: string
@@ -126,10 +249,12 @@ const COPY: Record<Language, IntroCopy> = {
     goLabel: 'GO — launch the ship',
     hint: 'Press GO to warp to our crew',
     skip: 'Skip',
-    transmission: 'INCOMING TRANSMISSION · CREW',
+    transmission: 'INCOMING TRANSMISSION',
+    crew: 'Crew',
+    works: 'Works',
     enter: 'Enter the portfolio',
-    prev: 'Previous crew member',
-    next: 'Next crew member',
+    prev: 'Previous',
+    next: 'Next',
   },
   th: {
     region: 'การเดินทางต้อนรับของ KUAi',
@@ -139,10 +264,12 @@ const COPY: Record<Language, IntroCopy> = {
     goLabel: 'GO — ออกเดินทาง',
     hint: 'กด GO เพื่อวาร์ปไปพบลูกเรือของเรา',
     skip: 'ข้าม',
-    transmission: 'INCOMING TRANSMISSION · CREW',
+    transmission: 'INCOMING TRANSMISSION',
+    crew: 'ลูกเรือ',
+    works: 'ผลงาน',
     enter: 'เข้าสู่ Portfolio',
-    prev: 'ลูกเรือคนก่อนหน้า',
-    next: 'ลูกเรือคนถัดไป',
+    prev: 'ก่อนหน้า',
+    next: 'ถัดไป',
   },
 }
 
@@ -240,33 +367,35 @@ function useStarfield(
 /* -------------------------------------------------------------------------- */
 
 function ProjectorPad() {
+  // Unique ids: two pads can be on screen, and one may be hidden.
+  const uid = useId().replace(/[^a-zA-Z0-9-]/g, '')
   return (
     <svg className="intro-projector" viewBox="0 0 300 130" aria-hidden="true">
       <defs>
-        <linearGradient id="intro-rim" x1="20" y1="0" x2="280" y2="0" gradientUnits="userSpaceOnUse">
+        <linearGradient id={`${uid}-intro-rim`} x1="20" y1="0" x2="280" y2="0" gradientUnits="userSpaceOnUse">
           <stop stopColor="#312e81" /><stop offset=".18" stopColor="#e9d5ff" /><stop offset=".42" stopColor="#7c3aed" />
           <stop offset=".7" stopColor="#c4b5fd" /><stop offset=".88" stopColor="#38bdf8" /><stop offset="1" stopColor="#1e1b4b" />
         </linearGradient>
-        <linearGradient id="intro-side" x1="0" y1="60" x2="0" y2="96" gradientUnits="userSpaceOnUse">
+        <linearGradient id={`${uid}-intro-side`} x1="0" y1="60" x2="0" y2="96" gradientUnits="userSpaceOnUse">
           <stop stopColor="#5b21b6" /><stop offset="1" stopColor="#0b0720" />
         </linearGradient>
-        <radialGradient id="intro-core" cx=".5" cy=".45" r=".6">
+        <radialGradient id={`${uid}-intro-core`} cx=".5" cy=".45" r=".6">
           <stop stopColor="#ffffff" /><stop offset=".35" stopColor="#a5f3fc" /><stop offset=".75" stopColor="#0ea5e9" /><stop offset="1" stopColor="#075985" />
         </radialGradient>
-        <radialGradient id="intro-table" cx=".5" cy=".5" r=".5">
+        <radialGradient id={`${uid}-intro-table`} cx=".5" cy=".5" r=".5">
           <stop stopColor="#67e8f9" stopOpacity=".35" /><stop offset="1" stopColor="#67e8f9" stopOpacity="0" />
         </radialGradient>
-        <filter id="intro-core-blur" x="-50%" y="-200%" width="200%" height="500%"><feGaussianBlur stdDeviation="6" /></filter>
+        <filter id={`${uid}-intro-core-blur`} x="-50%" y="-200%" width="200%" height="500%"><feGaussianBlur stdDeviation="6" /></filter>
       </defs>
-      <ellipse cx="150" cy="100" rx="150" ry="26" fill="url(#intro-table)" />
-      <path d="M20 62 v16 a130 32 0 0 0 260 0 v-16 Z" fill="url(#intro-side)" />
+      <ellipse cx="150" cy="100" rx="150" ry="26" fill={`url(#${uid}-intro-table)`} />
+      <path d="M20 62 v16 a130 32 0 0 0 260 0 v-16 Z" fill={`url(#${uid}-intro-side)`} />
       <ellipse cx="150" cy="78" rx="130" ry="32" fill="none" stroke="#f0abfc" strokeOpacity=".35" />
-      <ellipse cx="150" cy="62" rx="130" ry="32" fill="url(#intro-rim)" />
+      <ellipse cx="150" cy="62" rx="130" ry="32" fill={`url(#${uid}-intro-rim)`} />
       <ellipse cx="150" cy="62" rx="130" ry="32" fill="none" stroke="#f5d0fe" strokeOpacity=".55" />
       <ellipse cx="150" cy="62" rx="100" ry="24" fill="#120a2a" stroke="#a78bfa" strokeWidth="2" />
       <ellipse cx="150" cy="62" rx="86" ry="20" fill="none" stroke="#05030f" strokeWidth="9" strokeDasharray="70 14" />
-      <ellipse className="intro-core-glow" cx="150" cy="60" rx="70" ry="16" fill="#67e8f9" filter="url(#intro-core-blur)" />
-      <ellipse className="intro-core" cx="150" cy="60" rx="64" ry="14" fill="url(#intro-core)" />
+      <ellipse className="intro-core-glow" cx="150" cy="60" rx="70" ry="16" fill="#67e8f9" filter={`url(#${uid}-intro-core-blur)`} />
+      <ellipse className="intro-core" cx="150" cy="60" rx="64" ry="14" fill={`url(#${uid}-intro-core)`} />
       <path d="M92 58 C 120 50, 180 50, 208 58" stroke="#fff" strokeOpacity=".7" strokeWidth="2" fill="none" />
       <path d="M26 72 C 70 96, 230 96, 274 72" stroke="#67e8f9" strokeOpacity=".55" fill="none" />
       <circle className="kuai-blink" cx="150" cy="101" r="2.5" fill="#f0abfc" />
@@ -277,159 +406,87 @@ function ProjectorPad() {
   )
 }
 
-function HoloGlobe() {
+function HoloGlobe({ label }: { label: string }) {
+  const uid = useId().replace(/[^a-zA-Z0-9-]/g, '')
   return (
     <svg className="intro-globe" viewBox="0 0 200 200" aria-hidden="true">
       <defs>
-        <radialGradient id="intro-globe-fill" cx=".4" cy=".35" r=".7">
+        <radialGradient id={`${uid}-globe-fill`} cx=".4" cy=".35" r=".7">
           <stop stopColor="#a5f3fc" stopOpacity=".35" /><stop offset="1" stopColor="#0891b2" stopOpacity=".05" />
         </radialGradient>
       </defs>
-      <circle cx="100" cy="100" r="78" fill="url(#intro-globe-fill)" stroke="#67e8f9" strokeOpacity=".7" />
+      <circle cx="100" cy="100" r="78" fill={`url(#${uid}-globe-fill)`} stroke="#67e8f9" strokeOpacity=".7" />
       <ellipse cx="100" cy="100" rx="78" ry="26" fill="none" stroke="#67e8f9" strokeOpacity=".35" />
       <ellipse cx="100" cy="70" rx="68" ry="20" fill="none" stroke="#67e8f9" strokeOpacity=".25" />
       <ellipse cx="100" cy="130" rx="68" ry="20" fill="none" stroke="#67e8f9" strokeOpacity=".25" />
       <ellipse className="intro-meridian" cx="100" cy="100" rx="78" ry="78" fill="none" stroke="#a5f3fc" strokeOpacity=".5" />
       <ellipse className="intro-meridian intro-meridian--2" cx="100" cy="100" rx="78" ry="78" fill="none" stroke="#a5f3fc" strokeOpacity=".4" />
       <ellipse className="intro-meridian intro-meridian--3" cx="100" cy="100" rx="78" ry="78" fill="none" stroke="#a5f3fc" strokeOpacity=".3" />
-      <text x="100" y="108" textAnchor="middle" fontFamily="'Bricolage Grotesque', 'Space Grotesk', sans-serif" fontWeight="700" fontSize="26" fill="#ecfeff" opacity=".9">
-        KUAi
+      <text x="100" y="107" textAnchor="middle" fontFamily="'Bricolage Grotesque', 'Space Grotesk', sans-serif" fontWeight="700" fontSize={label.length > 5 ? 21 : 26} fill="#ecfeff" opacity=".9">
+        {label}
       </text>
     </svg>
   )
 }
 
-/* -------------------------------------------------------------------------- */
-/* Intro journey: ship → warp → hologram crew → portfolio                      */
-/* -------------------------------------------------------------------------- */
-
-type Phase = 'ship' | 'launch' | 'holo'
-
-interface IntroScreenProps {
-  onFinish: () => void
+function orbitRadius(): number {
+  if (window.innerWidth < 520) return 104
+  if (window.innerWidth < SIDE_BY_SIDE_MIN_WIDTH) return 220
+  return 175
 }
 
-/**
- * The welcome journey before the portfolio:
- * 1. The KUAi ship floats; GO launches it and the stars stretch into warp.
- * 2. A projector pad beams up three crew holograms orbiting a holo-globe.
- * 3. "Enter the portfolio" (or Skip / Esc at any time) opens the site.
- * Reduced-motion visitors skip the warp and the orbit stays still.
- */
-function IntroScreen({ onFinish }: IntroScreenProps) {
-  const { language } = useLanguage()
-  const copy = COPY[language]
+interface HoloOrbitProps {
+  /** Mono label above the stage, e.g. "CREW". */
+  label: string
+  globeLabel: string
+  count: number
+  itemLabel: (index: number) => string
+  renderCard: (index: number, isFront: boolean) => ReactNode
+  cardClassName?: string
+  /** Animate and listen to the arrow keys only while visible. */
+  active: boolean
+  shown: boolean
+  reduceMotion: boolean
+  prevLabel: string
+  nextLabel: string
+}
 
-  const [reduceMotion] = useState(prefersReducedMotion)
-  const [phase, setPhase] = useState<Phase>('ship')
-  const [leaving, setLeaving] = useState(false)
-  const [flash, setFlash] = useState(0)
-  const [crew, setCrew] = useState<readonly CrewCard[]>(FALLBACK_CREW)
+/** Three cards orbiting a hologram globe, beamed up from a projector pad. */
+function HoloOrbit({
+  label, globeLabel, count, itemLabel, renderCard, cardClassName = '',
+  active, shown, reduceMotion, prevLabel, nextLabel,
+}: HoloOrbitProps) {
   const [front, setFront] = useState(0)
-
-  const canvasRef = useRef<HTMLCanvasElement>(null)
-  const speedRef = useRef(0.6)
-  const goRef = useRef<HTMLButtonElement>(null)
-  const enterRef = useRef<HTMLButtonElement>(null)
   const cardRefs = useRef<(HTMLElement | null)[]>([])
   const globeRef = useRef<HTMLDivElement>(null)
-  const angleRef = useRef(0)
-  const targetRef = useRef<number | null>(null)
+  const angleRef = useRef(-40)
+  const targetRef = useRef<number | null>(0)
   const resumeAtRef = useRef(0)
   const frontRef = useRef(0)
-  const timersRef = useRef<number[]>([])
-
-  useStarfield(canvasRef, speedRef)
-
-  // Load the live crew details; the built-in copy shows until (or if) it arrives.
-  useEffect(() => {
-    const controller = new AbortController()
-    fetch(`${apiBaseUrl}/api/portfolio`, { signal: controller.signal })
-      .then((response) => (response.ok ? response.json() : null))
-      .then((result: unknown) => {
-        const live = toCrew(result)
-        if (live) setCrew(live)
-      })
-      .catch(() => undefined)
-    return () => controller.abort()
-  }, [])
-
-  // Clear any pending launch timers if the intro closes early.
-  useEffect(() => {
-    const timers = timersRef.current
-    return () => timers.forEach((timer) => window.clearTimeout(timer))
-  }, [])
-
-  const leave = useCallback(() => {
-    if (leaving) return
-    rememberIntroSeen()
-    setLeaving(true)
-    timersRef.current.push(window.setTimeout(onFinish, LEAVE_MS))
-  }, [leaving, onFinish])
-
-  const launch = useCallback(() => {
-    if (phase !== 'ship') return
-    if (reduceMotion) {
-      setPhase('holo')
-      return
-    }
-    setPhase('launch')
-    timersRef.current.push(
-      window.setTimeout(() => { speedRef.current = 55 }, 450),
-      window.setTimeout(() => setFlash((value) => value + 1), 1900),
-      window.setTimeout(() => {
-        speedRef.current = 0.35
-        angleRef.current = -40
-        targetRef.current = 0
-        resumeAtRef.current = performance.now() + 2500
-        setPhase('holo')
-      }, LAUNCH_MS),
-    )
-  }, [phase, reduceMotion])
 
   const bringToFront = useCallback((index: number) => {
-    const step = 360 / crew.length
+    const step = 360 / count
     const diff = ((((index * step - angleRef.current) % 360) + 540) % 360) - 180
     targetRef.current = angleRef.current + diff
     resumeAtRef.current = performance.now() + PAUSE_AFTER_INPUT_MS
-  }, [crew.length])
+  }, [count])
 
-  // Focus the main action of each scene for keyboard users.
+  // Arrow keys rotate every visible orbit.
   useEffect(() => {
-    if (phase === 'ship') goRef.current?.focus()
-    if (phase === 'holo') enterRef.current?.focus()
-  }, [phase])
-
-  // Keyboard: Esc skips; arrows rotate the crew.
-  useEffect(() => {
+    if (!active) return
     const onKeyDown = (event: KeyboardEvent) => {
-      if (event.key === 'Escape') {
-        event.preventDefault()
-        leave()
-      } else if (phase === 'holo' && event.key === 'ArrowRight') {
-        bringToFront((frontRef.current + 1) % crew.length)
-      } else if (phase === 'holo' && event.key === 'ArrowLeft') {
-        bringToFront((frontRef.current + crew.length - 1) % crew.length)
-      }
+      if (event.key === 'ArrowRight') bringToFront((frontRef.current + 1) % count)
+      if (event.key === 'ArrowLeft') bringToFront((frontRef.current + count - 1) % count)
     }
     window.addEventListener('keydown', onKeyDown)
     return () => window.removeEventListener('keydown', onKeyDown)
-  }, [bringToFront, crew.length, leave, phase])
+  }, [active, bringToFront, count])
 
-  // Keep the page behind from scrolling while the intro is open.
   useEffect(() => {
-    const previous = document.body.style.overflow
-    document.body.style.overflow = 'hidden'
-    return () => {
-      document.body.style.overflow = previous
-    }
-  }, [])
-
-  // Orbit the three hologram cards around the globe.
-  useEffect(() => {
-    if (phase !== 'holo') return
+    if (!active) return
     let frame = 0
-    const step = 360 / crew.length
+    const step = 360 / count
+    resumeAtRef.current = Math.max(resumeAtRef.current, performance.now() + 2500)
 
     const tick = (now: number) => {
       if (targetRef.current !== null) {
@@ -442,7 +499,7 @@ function IntroScreen({ onFinish }: IntroScreenProps) {
         angleRef.current += ORBIT_DEG_PER_FRAME
       }
 
-      const radius = window.innerWidth < 520 ? 104 : 270
+      const radius = orbitRadius()
       let best = 0
       let bestCos = -2
       cardRefs.current.forEach((card, index) => {
@@ -468,11 +525,177 @@ function IntroScreen({ onFinish }: IntroScreenProps) {
 
     frame = window.requestAnimationFrame(tick)
     return () => window.cancelAnimationFrame(frame)
-  }, [crew.length, phase, reduceMotion])
+  }, [active, count, reduceMotion])
 
   const pad = (value: number) => String(value).padStart(2, '0')
-  const previous = (front + crew.length - 1) % crew.length
-  const next = (front + 1) % crew.length
+
+  return (
+    <div className={`intro-station ${shown ? 'intro-station--shown' : ''}`}>
+      <div className="intro-stage">
+        <p className="intro-stage-head font-mono text-[11px] tracking-[0.22em] text-accent-cyan">
+          ◉ {label} · {pad(front + 1)} / {pad(count)}
+        </p>
+        <div className="intro-column" aria-hidden="true" />
+        <div className="intro-orbit-floor" aria-hidden="true" />
+        <div className="intro-ring">
+          <div ref={globeRef} className="intro-globe-wrap"><HoloGlobe label={globeLabel} /></div>
+          {Array.from({ length: count }, (_, index) => (
+            <article
+              key={index}
+              ref={(element) => { cardRefs.current[index] = element }}
+              className={`intro-card ${cardClassName} ${index === front ? 'intro-card--front' : ''}`}
+              onClick={() => bringToFront(index)}
+            >
+              {renderCard(index, index === front)}
+            </article>
+          ))}
+        </div>
+      </div>
+
+      <ProjectorPad />
+
+      <div className="mt-1.5 flex items-center justify-center gap-4">
+        <button type="button" className="intro-arrow" aria-label={`${prevLabel}: ${label}`} onClick={() => bringToFront((front + count - 1) % count)}>
+          <ChevronLeft size={18} aria-hidden="true" />
+        </button>
+        <div className="flex gap-2">
+          {Array.from({ length: count }, (_, index) => (
+            <button
+              key={index}
+              type="button"
+              aria-label={itemLabel(index)}
+              aria-pressed={index === front}
+              onClick={() => bringToFront(index)}
+              className={`intro-dot ${index === front ? 'intro-dot--on' : ''}`}
+            />
+          ))}
+        </div>
+        <button type="button" className="intro-arrow" aria-label={`${nextLabel}: ${label}`} onClick={() => bringToFront((front + 1) % count)}>
+          <ChevronRight size={18} aria-hidden="true" />
+        </button>
+      </div>
+    </div>
+  )
+}
+
+/* -------------------------------------------------------------------------- */
+/* Intro journey: ship → warp → crew + works holograms → portfolio             */
+/* -------------------------------------------------------------------------- */
+
+type Phase = 'ship' | 'launch' | 'holo'
+type HoloView = 'crew' | 'works'
+
+interface IntroScreenProps {
+  onFinish: () => void
+}
+
+/**
+ * The welcome journey before the portfolio:
+ * 1. The KUAi ship floats; GO launches it and the stars stretch into warp.
+ * 2. Two projector pads beam up holo-globes: the crew orbit one, our works the other
+ *    (side by side on wide screens, switchable on smaller ones).
+ * 3. "Enter the portfolio" (or Skip / Esc at any time) opens the site.
+ * Reduced-motion visitors skip the warp and the orbits stay still.
+ */
+function IntroScreen({ onFinish }: IntroScreenProps) {
+  const { language } = useLanguage()
+  const copy = COPY[language]
+
+  const [reduceMotion] = useState(prefersReducedMotion)
+  const [phase, setPhase] = useState<Phase>('ship')
+  const [leaving, setLeaving] = useState(false)
+  const [flash, setFlash] = useState(0)
+  const [data, setData] = useState<HologramData>(FALLBACK)
+  const [view, setView] = useState<HoloView>('crew')
+  const [sideBySide, setSideBySide] = useState(() => typeof window !== 'undefined' && window.innerWidth >= SIDE_BY_SIDE_MIN_WIDTH)
+
+  const canvasRef = useRef<HTMLCanvasElement>(null)
+  const speedRef = useRef(0.6)
+  const goRef = useRef<HTMLButtonElement>(null)
+  const enterRef = useRef<HTMLButtonElement>(null)
+  const timersRef = useRef<number[]>([])
+
+  useStarfield(canvasRef, speedRef)
+
+  // Load the live crew and works; the built-in copy shows until (or if) it arrives.
+  useEffect(() => {
+    const controller = new AbortController()
+    fetch(`${apiBaseUrl}/api/portfolio`, { signal: controller.signal })
+      .then((response) => (response.ok ? response.json() : null))
+      .then((result: unknown) => {
+        const live = toHologramData(result)
+        if (live) setData(live)
+      })
+      .catch(() => undefined)
+    return () => controller.abort()
+  }, [])
+
+  useEffect(() => {
+    const onResize = () => setSideBySide(window.innerWidth >= SIDE_BY_SIDE_MIN_WIDTH)
+    window.addEventListener('resize', onResize)
+    return () => window.removeEventListener('resize', onResize)
+  }, [])
+
+  // Clear any pending timers if the intro closes early.
+  useEffect(() => {
+    const timers = timersRef.current
+    return () => timers.forEach((timer) => window.clearTimeout(timer))
+  }, [])
+
+  const leave = useCallback(() => {
+    if (leaving) return
+    rememberIntroSeen()
+    setLeaving(true)
+    timersRef.current.push(window.setTimeout(onFinish, LEAVE_MS))
+  }, [leaving, onFinish])
+
+  const launch = useCallback(() => {
+    if (phase !== 'ship') return
+    if (reduceMotion) {
+      setPhase('holo')
+      return
+    }
+    setPhase('launch')
+    timersRef.current.push(
+      window.setTimeout(() => { speedRef.current = 55 }, 450),
+      window.setTimeout(() => setFlash((value) => value + 1), 1900),
+      window.setTimeout(() => {
+        speedRef.current = 0.35
+        setPhase('holo')
+      }, LAUNCH_MS),
+    )
+  }, [phase, reduceMotion])
+
+  // Focus the main action of each scene for keyboard users.
+  useEffect(() => {
+    if (phase === 'ship') goRef.current?.focus()
+    if (phase === 'holo') enterRef.current?.focus()
+  }, [phase])
+
+  // Esc skips the whole intro.
+  useEffect(() => {
+    const onKeyDown = (event: KeyboardEvent) => {
+      if (event.key === 'Escape') {
+        event.preventDefault()
+        leave()
+      }
+    }
+    window.addEventListener('keydown', onKeyDown)
+    return () => window.removeEventListener('keydown', onKeyDown)
+  }, [leave])
+
+  // Keep the page behind from scrolling while the intro is open.
+  useEffect(() => {
+    const previous = document.body.style.overflow
+    document.body.style.overflow = 'hidden'
+    return () => {
+      document.body.style.overflow = previous
+    }
+  }, [])
+
+  const { crew, works } = data
+  const crewShown = sideBySide || view === 'crew'
+  const worksShown = sideBySide || view === 'works'
 
   return (
     <section
@@ -512,84 +735,110 @@ function IntroScreen({ onFinish }: IntroScreenProps) {
         </div>
       )}
 
-      {/* Scene 2: three crew holograms orbit above the projector */}
+      {/* Scene 2: two holo-globes, the crew and our works */}
       {phase === 'holo' && (
         <div className="intro-scene intro-scene--holo">
-          <div className="intro-stage">
-            <p className="intro-stage-head font-mono text-[11px] tracking-[0.22em] text-accent-cyan">
-              ◉ {copy.transmission} {pad(crew.length)} · {pad(front + 1)} / {pad(crew.length)}
-            </p>
-            <div className="intro-column" aria-hidden="true" />
-            <div className="intro-orbit-floor" aria-hidden="true" />
-            <div className="intro-ring">
-              <div ref={globeRef} className="intro-globe-wrap"><HoloGlobe /></div>
-              {crew.map((member, index) => (
-                <article
-                  key={member.id}
-                  ref={(element) => { cardRefs.current[index] = element }}
-                  className={`intro-card ${index === front ? 'intro-card--front' : ''}`}
-                  onClick={() => bringToFront(index)}
-                >
-                  <div className="intro-card-top">
-                    <div className="intro-card-photo">
-                      {member.avatar && <img src={member.avatar} alt="" />}
-                    </div>
-                    <div>
-                      <h2 className="font-display text-[22px] font-bold leading-tight text-cyan-50">
-                        {member.nickname[language]}
-                      </h2>
-                      <p className="text-xs text-cyan-200">{member.role}</p>
-                    </div>
-                  </div>
-                  <div className="intro-card-more">
-                    <p className="mt-2.5 text-[13px] text-cyan-100">
-                      {member.fullName.en} · {member.fullName.th}
-                    </p>
-                    <div className="mt-3 rounded-xl border border-cyan-300/30 bg-cyan-950/40 px-3 py-2.5">
-                      <p className="font-mono text-[10px] tracking-[0.2em] text-accent-cyan">MAIN CONTRIBUTION</p>
-                      <p className="mt-1 text-[13px] text-cyan-50">{member.contribution[language]}</p>
-                    </div>
-                    <ul className="intro-card-skills mt-2.5 flex flex-wrap gap-1.5">
-                      {member.skills.map((skill) => (
-                        <li key={skill} className="rounded-full border border-cyan-300/35 px-2 py-0.5 text-[10px] text-cyan-100">
-                          {skill}
-                        </li>
-                      ))}
-                    </ul>
-                  </div>
-                </article>
-              ))}
-            </div>
-          </div>
+          <p className="font-mono text-[11px] tracking-[0.3em] text-accent-magenta">◉ {copy.transmission}</p>
 
-          <ProjectorPad />
-
-          <div className="mt-1.5 flex items-center justify-center gap-4">
-            <button type="button" className="intro-arrow" aria-label={copy.prev} onClick={() => bringToFront(previous)}>
-              <ChevronLeft size={18} aria-hidden="true" />
-            </button>
-            <div className="flex gap-2">
-              {crew.map((member, index) => (
+          {!sideBySide && (
+            <div className="intro-switch" role="group" aria-label={copy.transmission}>
+              {(['crew', 'works'] as const).map((item) => (
                 <button
-                  key={member.id}
+                  key={item}
                   type="button"
-                  aria-label={member.nickname[language]}
-                  aria-pressed={index === front}
-                  onClick={() => bringToFront(index)}
-                  className={`intro-dot ${index === front ? 'intro-dot--on' : ''}`}
-                />
+                  aria-pressed={view === item}
+                  onClick={() => setView(item)}
+                  className={view === item ? 'intro-switch--on' : undefined}
+                >
+                  {copy[item]}
+                </button>
               ))}
             </div>
-            <button type="button" className="intro-arrow" aria-label={copy.next} onClick={() => bringToFront(next)}>
-              <ChevronRight size={18} aria-hidden="true" />
-            </button>
+          )}
+
+          <div className="intro-stations">
+            <HoloOrbit
+              label="CREW"
+              globeLabel="CREW"
+              count={crew.length}
+              itemLabel={(index) => crew[index].nickname[language]}
+              active={crewShown}
+              shown={crewShown}
+              reduceMotion={reduceMotion}
+              prevLabel={copy.prev}
+              nextLabel={copy.next}
+              renderCard={(index) => {
+                const member = crew[index]
+                return (
+                  <>
+                    <div className="intro-card-top">
+                      <div className="intro-card-photo">
+                        {member.avatar && <img src={member.avatar} alt="" />}
+                      </div>
+                      <div>
+                        <h2 className="font-display text-[22px] font-bold leading-tight text-cyan-50">
+                          {member.nickname[language]}
+                        </h2>
+                        <p className="text-xs text-cyan-200">{member.role}</p>
+                      </div>
+                    </div>
+                    <div className="intro-card-more">
+                      <p className="mt-2.5 text-[13px] text-cyan-100">
+                        {member.fullName.en} · {member.fullName.th}
+                      </p>
+                      <div className="mt-3 rounded-xl border border-cyan-300/30 bg-cyan-950/40 px-3 py-2.5">
+                        <p className="font-mono text-[10px] tracking-[0.2em] text-accent-cyan">MAIN CONTRIBUTION</p>
+                        <p className="mt-1 text-[13px] text-cyan-50">{member.contribution[language]}</p>
+                      </div>
+                      <ul className="intro-card-skills mt-2.5 flex flex-wrap gap-1.5">
+                        {member.skills.map((skill) => (
+                          <li key={skill} className="rounded-full border border-cyan-300/35 px-2 py-0.5 text-[10px] text-cyan-100">
+                            {skill}
+                          </li>
+                        ))}
+                      </ul>
+                    </div>
+                  </>
+                )
+              }}
+            />
+
+            <HoloOrbit
+              label="MISSIONS"
+              globeLabel="WORKS"
+              count={works.length}
+              itemLabel={(index) => works[index].title[language]}
+              cardClassName="intro-card--work"
+              active={worksShown}
+              shown={worksShown}
+              reduceMotion={reduceMotion}
+              prevLabel={copy.prev}
+              nextLabel={copy.next}
+              renderCard={(index) => {
+                const work = works[index]
+                return (
+                  <>
+                    <div className="intro-work-cover">
+                      {work.cover && <img src={work.cover} alt="" />}
+                    </div>
+                    <p className="mt-2.5 font-mono text-[9.5px] tracking-[0.16em] text-accent-cyan">{work.tag[language]}</p>
+                    <h2 className="mt-1 font-display text-[16px] font-bold leading-snug text-cyan-50">
+                      {work.title[language]}
+                    </h2>
+                    <div className="intro-card-more">
+                      <p className="mt-1.5 text-[12.5px] leading-5 text-cyan-100">{work.description[language]}</p>
+                    </div>
+                  </>
+                )
+              }}
+            />
           </div>
 
           <button
             ref={enterRef}
             type="button"
             onClick={leave}
-            className="kuai-gradient-button mt-4 inline-flex min-h-12 items-center gap-2 rounded-full px-7 text-[15px] font-semibold text-white focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-accent-magenta"
+            className="kuai-gradient-button mt-3 inline-flex min-h-12 items-center gap-2 rounded-full px-7 text-[15px] font-semibold text-white focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-accent-magenta"
           >
             {copy.enter}
             <ArrowRight size={18} aria-hidden="true" />

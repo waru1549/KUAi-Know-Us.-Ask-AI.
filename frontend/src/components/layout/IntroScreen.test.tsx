@@ -85,6 +85,23 @@ describe('IntroScreen Component', () => {
     expect(screen.getByRole('button', { name: /Enter the portfolio/ })).toBeInTheDocument()
   })
 
+  it('should show our works on the second hologram globe', () => {
+    renderWithLanguage(<IntroScreen onFinish={() => undefined} />)
+
+    fireEvent.click(screen.getByRole('button', { name: 'GO — launch the ship' }))
+    act(() => {
+      vi.advanceTimersByTime(2500)
+    })
+
+    expect(screen.getByRole('heading', { name: 'Smart Lab Booking System' })).toBeInTheDocument()
+    expect(screen.getByRole('heading', { name: 'Bangkok University School of Engineering Website' })).toBeInTheDocument()
+
+    // Narrow screens switch between the two globes.
+    const worksButton = screen.getByRole('button', { name: 'Works' })
+    fireEvent.click(worksButton)
+    expect(worksButton).toHaveAttribute('aria-pressed', 'true')
+  })
+
   it('should finish and remember the intro when skipped', () => {
     const onFinish = vi.fn()
     renderWithLanguage(<IntroScreen onFinish={onFinish} />)
