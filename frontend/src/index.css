@@ -309,8 +309,8 @@ textarea {
 .kuai-lift { transition: transform .5s cubic-bezier(.2,.8,.2,1), box-shadow .5s; }
 .kuai-lift:hover { transform: translateY(-8px); box-shadow: 0 40px 90px -35px var(--kuai-ring-color, #d946ef); }
 
-/* Photos go from grayscale to colour on hover */
-.kuai-photo img { filter: grayscale(1) contrast(1.05); transition: filter .6s, transform .8s cubic-bezier(.2,.8,.2,1); }
+/* Photos keep their real colours; they zoom gently on hover */
+.kuai-photo img { transition: transform .8s cubic-bezier(.2,.8,.2,1); }
 .kuai-lift:hover .kuai-photo img { filter: none; transform: scale(1.06); }
 
 .kuai-float { animation: kuai-float 7s ease-in-out infinite; }
